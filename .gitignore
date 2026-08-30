@@ -1,0 +1,41 @@
+# Dependencias
+node_modules/
+vendor/
+
+# Entornos virtuales de Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Archivos de entorno y secretos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Builds y distribuciones
+dist/
+build/
+out/
+coverage/
+*.egg-info/
+
+# Plataforma / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Base de datos y temporales
+*.sqlite
+*.sqlite3
+tmp/
+temp/

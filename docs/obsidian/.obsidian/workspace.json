@@ -1,0 +1,221 @@
+{
+  "main": {
+    "id": "9ded6b6880286d90",
+    "type": "split",
+    "children": [
+      {
+        "id": "682a2f0b79205cb9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9f5a31e52d65e1fb",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vista gráfica"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4fae437740aeb2ef",
+    "type": "split",
+    "children": [
+      {
+        "id": "1d63052c967ca01b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b5fb2aac7800d398",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de archivos"
+            }
+          },
+          {
+            "id": "fdc8a6c5f1839854",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Buscar"
+            }
+          },
+          {
+            "id": "a9437ad212d63bf0",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "d0360081f867bc55",
+    "type": "split",
+    "children": [
+      {
+        "id": "751a86082f5d7a0a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0e609f97d9089193",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Enlaces entrantes"
+            }
+          },
+          {
+            "id": "9afc000132495795",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enlaces salientes"
+            }
+          },
+          {
+            "id": "4994f0e76caf40be",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "82bcfba5d47b91e4",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas las propiedades"
+            }
+          },
+          {
+            "id": "bd0d6770dd280cc5",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir selector rápido": false,
+      "graph:Abrir vista gráfica": false,
+      "canvas:Crear nuevo lienzo": false,
+      "daily-notes:Abrir la nota de hoy": false,
+      "templates:Insertar plantilla": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Crear nueva base": false
+    }
+  },
+  "active": "9f5a31e52d65e1fb",
+  "lastOpenFiles": [
+    "06 - Registro/06 - Índice.md",
+    "05 - Versiones/05 - Índice.md",
+    "04 - Investigacion/04 - Índice.md",
+    "03 - Seguridad/Seguridad.md",
+    "03 - Seguridad/03 - Índice.md",
+    "02 - Desarrollo/Git y GitHub.md",
+    "02 - Desarrollo/Gestion Avanzada de Webs.md",
+    "02 - Desarrollo/Documentacion.md",
+    "02 - Desarrollo/Configuracion de Bots.md",
+    "02 - Desarrollo/Acciones de Bots.md",
+    "02 - Desarrollo/02 - Índice.md",
+    "01 - Planificacion/Principios Tecnicos.md",
+    "01 - Planificacion/01 - Índice.md",
+    "00 - Inicio/00 - Índice.md",
+    "00 - Inicio/Inicio.md",
+    "00 - Inicio/Estado Actual.md",
+    "00 - Inicio/Vision.md",
+    "ProjectLumina_Planificacion.md",
+    "06 - Registro/Errores.md",
+    "06 - Registro/Decisiones.md",
+    "06 - Registro/Changelog.md",
+    "05 - Versiones/v0.3.md",
+    "05 - Versiones/v0.2.md",
+    "05 - Versiones/v0.1.md",
+    "04 - Investigacion/systemd.md",
+    "04 - Investigacion/SSH.md",
+    "06 - Registro",
+    "05 - Versiones",
+    "04 - Investigacion",
+    "03 - Seguridad",
+    "02 - Desarrollo",
+    "01 - Planificacion",
+    "00 - Inicio",
+    "Sin confirmar 65077.crdownload"
+  ]
+}
