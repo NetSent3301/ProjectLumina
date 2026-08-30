@@ -7,9 +7,9 @@
 ## Tecnologías propuestas
 
 - **Python.**
-- **Flask** o **FastAPI.**
+- **FastAPI** (elegido) → [[Decisiones#Backend con FastAPI]].
 
-> ⚠️ La elección final entre Flask y FastAPI se hará al comenzar la implementación → [[Decisiones]].
+> La elección final entre Flask y FastAPI se hizo al comenzar la implementación → [[Decisiones]].
 
 ---
 

@@ -1,11 +1,28 @@
 # Backend — ProjectLumina
 
-## Tecnologías propuestas
+## Tecnologías
 
 - **Python.**
-- **Flask** o **FastAPI.**
+- **FastAPI** (elegido).
 
-> La elección final entre Flask y FastAPI se hará al comenzar la implementación.
+> La elección Flask vs FastAPI se resolvió a favor de **FastAPI** → [decisiones (obsidian)](../obsidian/06%20-%20Registro/Decisiones.md).
+
+## Estado de la implementación
+
+La base del backend ya está montada en `lumina.py` (un único archivo):
+
+- ✅ Servidor FastAPI arrancable.
+- ✅ Endpoint `GET /api/health` de verificación.
+- ✅ Sirve la página `web/index.html` en la raíz `/`.
+
+Pendiente (cuando se tenga acceso al servidor):
+
+- ❌ Gestión real de bots y webs (iniciar/detener/reiniciar/estados).
+- ❌ Métricas del servidor (CPU/RAM/disco/red).
+- ❌ Base de datos y modelos.
+- ❌ Seguridad y exposición a Internet.
+
+> Cómo arrancarlo: `bash scripts/run.sh`
 
 ## Responsabilidades
 

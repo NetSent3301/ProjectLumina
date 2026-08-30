@@ -109,21 +109,30 @@ flowchart LR
 
 > En definición. Ver [Requisitos](docs/requisitos.md).
 
-- Servidor con **Debian 13**.
 - **Python 3** (backend).
 - Navegador moderno (laptop e iPhone).
+- Servidor con **Debian 13** (para el despliegue real).
 
 ---
 
-## 📦 Instalación
+## 🚀 Inicio rápido
 
-> Pendiente de implementar.
+> ⚙️ Estado actual: **base inicial** funcional localmente con [FastAPI]. La gestión real de bots/webs se añadirá en `v0.1` cuando se disponga de acceso al servidor.
 
----
+```bash
+bash scripts/run.sh
+```
 
-## 🚀 Uso
+Este único comando crea el entorno virtual (si no existe), instala las dependencias y arranca el servidor.
 
-> Pendiente de implementar.
+- **Web:** http://127.0.0.1:8000/
+- **API de prueba:** http://127.0.0.1:8000/api/health → `{"status":"ok"}`
+
+Ejecutar los tests:
+
+```bash
+.venv/bin/pytest pruebas/
+```
 
 ---
 

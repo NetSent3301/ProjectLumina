@@ -6,9 +6,11 @@
 
 ## Fase actual
 
-**Planificación.** 🟡
+**Base del proyecto inicializada.** 🟢
 
-El proyecto se encuentra en la etapa de planificación, previa a la implementación.
+La etapa de planificación avanzó y la **base inicial** ya está montada y funciona localmente (sin servidor). Se pasó de solo documentación a tener un backend mínimo ejecutable con **FastAPI**.
+
+> Detalles en [implementación (obsidian)](../docs/obsidian/06%20-%20Registro/Implementacion.md)
 
 ---
 
@@ -16,9 +18,9 @@ El proyecto se encuentra en la etapa de planificación, previa a la implementaci
 
 ```mermaid
 flowchart TD
-    A[Planificación] --> B[Requisitos técnicos]
-    B --> C[Arquitectura definitiva del MVP]
-    C --> D[Estructura del repositorio]
+    A[Planificación] --> B[Base del proyecto ✅]
+    B --> C[Requisitos técnicos]
+    C --> D[Arquitectura definitiva del MVP]
     D --> E[Desarrollo v0.1.0]
     E --> F[Testing]
     F --> G[Deploy]
@@ -32,11 +34,11 @@ flowchart TD
 
 | Fase | Estado |
 |------|--------|
-| Planificación | ✅ En curso (documentación generada) |
+| Planificación | ✅ Documentación generada |
+| Base del proyecto | ✅ Backend mínimo con FastAPI, arranca y verifica conectividad |
 | Requisitos técnicos | ⏳ Pendiente |
 | Arquitectura definitiva MVP | ⏳ Pendiente |
-| Estructura del repositorio | ⏳ Pendiente |
-| Desarrollo v0.1.0 | ⏳ Pendiente |
+| Desarrollo v0.1.0 | ⏳ Pendiente (requiere acceso al servidor) |
 | Testing | ⏳ Pendiente |
 | Deploy | ⏳ Pendiente |
 
@@ -52,11 +54,11 @@ A partir de ahí se construirá el resto del sistema.
 
 ## Siguientes acciones
 
-1. Definir los **requisitos técnicos** definitivos.
-2. Elegir **Flask vs FastAPI**.
-3. Fijar la **arquitectura definitiva del MVP**.
-4. Estructurar el **repositorio**.
-5. Iniciar el **desarrollo de v0.1**.
+1. ✅ Elegir backend → **FastAPI**.
+2. ✅ Estructurar el repositorio y montar la base ejecutable.
+3. Definir los **requisitos técnicos** definitivos.
+4. Fijar la **arquitectura definitiva del MVP**.
+5. (Cuando se recupere acceso al servidor) iniciar el **desarrollo de v0.1**: gestión de bots/webs.
 
 ---
 

@@ -30,6 +30,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# Configuración local de Obsidian
+.obsidian/
+workspace.json
+workspace-mobile.json
+
 # Logs
 *.log
 logs/
@@ -37,5 +42,6 @@ logs/
 # Base de datos y temporales
 *.sqlite
 *.sqlite3
+data/
 tmp/
 temp/

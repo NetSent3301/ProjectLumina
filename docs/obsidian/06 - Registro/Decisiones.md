@@ -46,11 +46,19 @@
 - **Motivo:** sencillez → [[Principios Tecnicos#Simplicidad inicial]].
 - **Alternativa:** WebSockets → a futuro para tiempo real → [[API#WebSockets]].
 
+### Backend con FastAPI
+- **Contexto:** elegir entre Flask y FastAPI → [[Backend]].
+- **Decisión:** **FastAPI**.
+- **Motivo:** async, documentación automática (Swagger), tipado moderno; buena base para crecer a WebSockets y multi-servidor.
+- **Alternativa:** Flask → descartado por ahora (más simple de aprender, pero FastAPI ofrece mejor base).
+- **Relacionado:** [[Backend]] · [[API]] · [[Decisiones#Decisiones pendientes|Decisión: Flask vs FastAPI]].
+- **Estado:** ✅ decidido.
+
 ---
 
 ## Decisiones pendientes
 
-- [ ] Elegir Flask vs FastAPI → [[Backend]].
+- [x] Elegir Flask vs FastAPI → **FastAPI** → [[Backend]].
 - [ ] Definir arquitectura definitiva del MVP → [[Arquitectura]].
 - [ ] Definir estructura exacta del repositorio → [[Arquitectura#Estructura del código]].
 
