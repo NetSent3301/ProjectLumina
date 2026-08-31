@@ -4,6 +4,41 @@
 
 ---
 
+## [v0.1.1] - 2026-08-31
+
+### Añadido
+- **Multi-servidor (agentes Lumina)**: el panel central registra y vigila otras instancias de Lumina corriendo en otras máquinas (homelab, VPS, Raspberry Pi).
+  - `POST /api/servidores` — registra un agente remoto (nombre, URL de su API, token opcional).
+  - `GET /api/servidores` — lista agentes con su conexión en vivo (chequeo cada 15 s vía `GET /api/servidor` con timeout 3 s y `trust_env=False`).
+  - `DELETE /api/servidores/{id}` — quita un agente.
+  - `GET /api/conexion` — resumen global: principal (siempre alcanzable si la API responde) + lista de remotos con estado y detalle.
+- **Indicador global de conexión** en la barra lateral (píldora con cuatro estados):
+  - `conn--ok` · “conectado · este equipo” / “conectado a N servidores”
+  - `conn--warn` · “sin acceso a M servidor(es)”
+  - `conn--off` · “sin acceso al servidor principal” / “sin acceso a ningún servidor remoto”
+  - `conn--checking` · comprobando…
+- **Vista "servidores"** en el panel (navegación lateral):
+  - Tarjetas de estado de conexión (principal + remotos) con detalle y última comprobación.
+  - Formulario para registrar un agente remoto (nombre, URL, token).
+  - Listado de registrados con botón “quitar”.
+- **Docker para homelab** → `Dockerfile` + `docker-compose.yml` con dos perfiles:
+  - `panel` — panel central (`docker compose --profile panel up -d`), sin acceso a systemd del host.
+  - `agente` — en cada máquina del homelab (`docker compose --profile agente up -d`), con `--pid=host --privileged` y bind mounts `/run/systemd`, `/var/run/dbus`, `/sys/fs/cgroup` para `systemctl`/`journalctl`.
+- `.env.example` con variables `LUMINA_TOKEN`, `LUMINA_PORT`, `LUMINA_DB`, `LUMINA_DEBUG`.
+
+### Cambiado
+- `Estado Actual.md` actualizado: v0.1 completado + v0.1.1 multi-servidor + Docker.
+- Modelo `Servidor` y `ServidorCreate` en `app/models/servidor.py`.
+- Servicio `app/services/servidores.py` (CRUD + probe + `resumen_conexion`).
+- Router `app/api/servidores.py` y montaje en `app/main.py`.
+- Frontend: `initServidores`, `cargarConexion`, `renderIndicadorConexion`, `renderVistaConexion`, `registrarServidor` en `script.js`; estilos `.conn`, `.cards--stack`, `.server-form`, `.btn-ghost.is-danger` en `style.css`.
+
+### Corregido
+- Validación de duplicados en `POST /api/servicios` y `POST /api/servidores` → 409.
+- Tests: +2 (duplicado servicios, CRUD servidores/conexión) = 8 passed.
+
+---
+
 ## [v0.1.0-dev] - 2026-08-30
 
 ### Añadido
