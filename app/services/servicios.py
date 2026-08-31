@@ -89,6 +89,14 @@ def detalle(servicio_id: int) -> dict:
 
 def crear(datos: ServicioCreate) -> dict:
     with Session(engine) as session:
+        existente = session.exec(
+            select(Servicio).where(Servicio.nombre == datos.nombre)
+        ).first()
+        if existente:
+            raise HTTPException(
+                status_code=409,
+                detail="ya existe un servicio con ese nombre",
+            )
         servicio = Servicio(**datos.model_dump())
         session.add(servicio)
         session.commit()

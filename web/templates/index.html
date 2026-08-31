@@ -27,6 +27,9 @@
       <a href="#/servicios" class="nav-item" data-view="servicios">
         <span class="nav-dot"></span> servicios
       </a>
+      <a href="#/servidores" class="nav-item" data-view="servidores">
+        <span class="nav-dot"></span> servidores
+      </a>
       <a href="#/registro" class="nav-item" data-view="registro">
         <span class="nav-dot"></span> registro
       </a>
@@ -36,6 +39,9 @@
     </nav>
 
     <div class="sidebar-footer">
+      <span id="connState" class="conn conn--checking" title="comprobando la conexión…">
+        <span class="conn-dot"></span><span id="connText">comprobando…</span>
+      </span>
       <span id="clock">00:00:00</span>
       <span class="sidebar-footer-sep">·</span>
       <span>v0.1.0</span>
@@ -172,6 +178,58 @@
 
     </section>
 
+    <!-- Vista: servidores (agentes Lumina) -->
+    <section class="view" data-view="servidores">
+
+      <header class="topbar">
+        <div>
+          <h1>servidores</h1>
+          <p class="topbar-sub">conexión con este equipo y los servidores remotos que gestiona Lumina</p>
+        </div>
+      </header>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>estado de conexión</h2>
+          <span class="tab-count" id="connResumen">comprobando…</span>
+        </div>
+        <div class="cards cards--stack" id="conexionGrid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>registrar un servidor remoto</h2>
+          <span class="tab-count">agente Lumina · se consulta por su API</span>
+        </div>
+
+        <form class="server-form" id="serverForm" novalidate>
+          <label class="field">
+            <span class="field-label">nombre <em>*</em></span>
+            <input class="field-input" id="sv_nombre" name="nombre" required placeholder="ej. raspberry pi" autocomplete="off" maxlength="80">
+          </label>
+          <label class="field">
+            <span class="field-label">dirección <em>*</em></span>
+            <input class="field-input" id="sv_url" name="url" required placeholder="http://192.168.1.20:8127" autocomplete="off" maxlength="300">
+            <span class="field-hint">url de su API de Lumina.</span>
+          </label>
+          <label class="field">
+            <span class="field-label">token <em class="opt">si usa LUMINA_TOKEN</em></span>
+            <input class="field-input" id="sv_token" name="token" placeholder="su clave de API remota" autocomplete="off" maxlength="200">
+          </label>
+          <button type="submit" class="btn btn-primary server-submit"><span class="btn-icon">+</span> registrar</button>
+          <p class="field-hint server-hint">en ese servidor debe correr otro Lumina con su API activa; este panel la consulta cada 15 segundos para comprobar la conexión.</p>
+        </form>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>servidores registrados</h2>
+        </div>
+        <div class="cards cards--stack" id="servidoresGrid"></div>
+      </section>
+
+    </section>
+
     <!-- Vista: registro (logs de systemd en un terminal) -->
     <section class="view" data-view="registro">
       <header class="topbar">
@@ -219,59 +277,103 @@
     <header class="modal-head">
       <div>
         <h2 id="serviceModalTitle">conectar un servicio</h2>
-        <p class="modal-sub">registra un bot o una web gestionados desde este equipo</p>
+        <p class="modal-sub">descríbelo y verás en directo cómo lo gestionará Lumina</p>
       </div>
       <button class="modal-x" id="modalClose" aria-label="cerrar">×</button>
     </header>
 
     <form id="serviceForm" novalidate>
 
-      <div class="modal-tabs" role="tablist" aria-label="Tipo de servicio">
-        <button type="button" class="modal-tab is-active" data-modal-tipo="bot" role="tab" aria-selected="true">
-          <span>🤖</span> bot
-        </button>
-        <button type="button" class="modal-tab" data-modal-tipo="web" role="tab" aria-selected="false">
-          <span>🌐</span> web
-        </button>
-      </div>
+      <!-- 1 · tipo -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">1</span> ¿qué vas a conectar?</div>
+        <div class="modal-tabs" role="tablist" aria-label="Tipo de servicio">
+          <button type="button" class="modal-tab is-active" data-modal-tipo="bot" role="tab" aria-selected="true">
+            <span class="modal-tab-ico">🤖</span>
+            <span class="modal-tab-text">
+              <strong>bot</strong>
+              <small>proceso de python, discord, telegram…</small>
+            </span>
+          </button>
+          <button type="button" class="modal-tab" data-modal-tipo="web" role="tab" aria-selected="false">
+            <span class="modal-tab-ico">🌐</span>
+            <span class="modal-tab-text">
+              <strong>web</strong>
+              <small>sitio, API, tienda…</small>
+            </span>
+          </button>
+        </div>
+      </section>
 
-      <label class="field">
-        <span class="field-label">nombre <em>*</em></span>
-        <input class="field-input" id="f_nombre" name="nombre" required placeholder="ej. mi-bot de discord" autocomplete="off" maxlength="80">
-      </label>
-
-      <label class="field">
-        <span class="field-label">unidad systemd</span>
-        <input class="field-input" id="f_servicio" name="servicio" placeholder="ej. mi-bot.service" autocomplete="off" maxlength="120">
-        <span class="field-hint">si usas systemd, el estado reflejará la unidad (iniciar, detener, reiniciar y logs).</span>
-      </label>
-
-      <div class="field-grid">
+      <!-- 2 · nombre -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">2</span> ¿cómo se llama?</div>
         <label class="field">
-          <span class="field-label">comando</span>
-          <input class="field-input" id="f_comando" name="comando" placeholder="ej. python3 bot.py" autocomplete="off" maxlength="200">
+          <span class="field-label">nombre <em>*</em></span>
+          <input class="field-input" id="f_nombre" name="nombre" required placeholder="ej. bot de lumina" autocomplete="off" maxlength="80">
+          <span class="field-hint">solo tú lo verás: es el título de su tarjeta en el panel.</span>
         </label>
+      </section>
+
+      <!-- 3 · cómo se controla -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">3</span> ¿cómo se controla?</div>
+
         <label class="field">
-          <span class="field-label">ruta</span>
-          <input class="field-input" id="f_ruta" name="ruta" placeholder="directorio de trabajo" autocomplete="off" maxlength="200">
+          <span class="field-label">unidad systemd <em class="opt">opcional</em></span>
+          <input class="field-input" id="f_servicio" name="servicio" placeholder="ej. mi-bot.service" autocomplete="off" maxlength="120">
+          <span class="field-hint" id="hintServicio">con unidad: podrás <strong>iniciar, detener, reiniciar y leer logs</strong>; sin unidad, el servicio solo queda registrado (se verá offline).</span>
         </label>
-      </div>
 
-      <label class="field is-hidden" id="f_checkUrlField">
-        <span class="field-label">check de estado (web)</span>
-        <input class="field-input" id="f_check_url" name="check_url" placeholder="https://… responde por HTTP" autocomplete="off" maxlength="300">
-        <span class="field-hint">vacío: la web se marcará en línea sin verificación.</span>
-      </label>
+        <div class="is-hidden" id="controlWeb">
+          <label class="field">
+            <span class="field-label">check de estado <em class="opt">opcional</em></span>
+            <input class="field-input" id="f_check_url" name="check_url" placeholder="https://tu-sitio.com" autocomplete="off" maxlength="300">
+            <span class="field-hint">dirección que Lumina comprueba por HTTP: <strong>en línea</strong> si responde con código &lt; 400, <strong>offline</strong> si no. Vacía → se verá offline hasta que la definas.</span>
+          </label>
+        </div>
+      </section>
 
-      <div class="field-checks">
-        <label class="check">
-          <input type="checkbox" id="f_auto_inicio" name="auto_inicio">
-          <span>auto-inicio</span>
-        </label>
-        <label class="check">
-          <input type="checkbox" id="f_auto_reinicio" name="auto_reinicio">
-          <span>auto-reinicio</span>
-        </label>
+      <!-- 4 · detalles -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">4</span> detalles <em class="opt">opcional</em></div>
+        <div class="field-grid">
+          <label class="field">
+            <span class="field-label">comando</span>
+            <input class="field-input" id="f_comando" name="comando" placeholder="ej. python3 bot.py" autocomplete="off" maxlength="200">
+            <span class="field-hint">cómo se lanza, para tu referencia.</span>
+          </label>
+          <label class="field">
+            <span class="field-label">ruta</span>
+            <input class="field-input" id="f_ruta" name="ruta" placeholder="directorio de trabajo" autocomplete="off" maxlength="200">
+            <span class="field-hint">carpeta donde vive el servicio.</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 5 · arranque -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">5</span> arranque</div>
+        <div class="field-checks">
+          <label class="check">
+            <input type="checkbox" id="f_auto_inicio" name="auto_inicio">
+            <span>auto-inicio</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="f_auto_reinicio" name="auto_reinicio">
+            <span>auto-reinicio</span>
+          </label>
+        </div>
+        <span class="field-hint">por ahora se guardan como preferencias; el arranque/reinicio automático real se implementará en próximas versiones.</span>
+      </section>
+
+      <!-- resumen en vivo -->
+      <div class="connect-summary">
+        <div class="sum-title">así se gestionará</div>
+        <dl class="sum-rows">
+          <div class="sum-row"><dt>estado</dt><dd id="sumEstado">—</dd></div>
+          <div class="sum-row"><dt>acciones</dt><dd id="sumAcciones">—</dd></div>
+        </dl>
       </div>
 
       <p class="modal-error is-hidden" id="modalError"></p>

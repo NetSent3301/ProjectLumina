@@ -89,3 +89,58 @@ def test_web_con_check_url():
     det = client.get(f"/api/servicios/{sid}", headers=HEADERS).json()
     assert det["estado"] == "offline"
     client.delete(f"/api/servicios/{sid}", headers=HEADERS)
+
+
+def test_nombre_duplicado_rechazado():
+    datos = {"tipo": "bot", "nombre": "unico"}
+    assert client.post("/api/servicios", json=datos, headers=HEADERS).status_code == 201
+
+    duplicado = client.post("/api/servicios", json=datos, headers=HEADERS)
+    assert duplicado.status_code == 409
+    assert duplicado.json()["detail"] == "ya existe un servicio con ese nombre"
+    assert len(client.get("/api/servicios", headers=HEADERS).json()) == 1
+
+    sid = client.get("/api/servicios", headers=HEADERS).json()[0]["id"]
+    client.delete(f"/api/servicios/{sid}", headers=HEADERS)
+
+
+def test_servidores_y_conexion():
+    # Sin remotos: el principal (esta API) siempre es alcanzable.
+    assert client.get("/api/servidores", headers=HEADERS).json() == []
+    conexion = client.get("/api/conexion", headers=HEADERS).json()
+    assert conexion["principal"]["alcanzable"] is True
+    assert conexion["total_remotos"] == 0
+
+    # Registro de un agente inalcanzable (nada escucha en ese puerto).
+    r = client.post(
+        "/api/servidores",
+        json={"nombre": "pi", "url": "http://127.0.0.1:1"},
+        headers=HEADERS,
+    )
+    assert r.status_code == 201
+    sid = r.json()["id"]
+    assert r.json()["conexion"] is False
+
+    # Duplicado rechazado.
+    duplicado = client.post(
+        "/api/servidores",
+        json={"nombre": "pi", "url": "http://127.0.0.1:2"},
+        headers=HEADERS,
+    )
+    assert duplicado.status_code == 409
+
+    # El listado refleja su conexión y el resumen global los cuenta.
+    lista = client.get("/api/servidores", headers=HEADERS).json()
+    assert len(lista) == 1
+    assert lista[0]["conexion"] is False
+    assert lista[0]["detalle"].startswith("sin acceso")
+
+    conexion = client.get("/api/conexion", headers=HEADERS).json()
+    assert conexion["total_remotos"] == 1
+    assert conexion["sin_acceso_a"] == 1
+    assert conexion["conectado_a"] == 0
+
+    # Eliminar (y 404 si ya no existe).
+    assert client.delete(f"/api/servidores/{sid}", headers=HEADERS).status_code == 204
+    assert client.get("/api/servidores", headers=HEADERS).json() == []
+    assert client.delete(f"/api/servidores/{sid}", headers=HEADERS).status_code == 404

@@ -17,8 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initServiceModal();
   initServiceTabs();
   initTerminal();
+  initServidores();
   loadServicios();
   loadMetricas();
+  cargarConexion();
 });
 
 /* ---------- reloj del servidor ---------- */
@@ -453,29 +455,15 @@ function initServiceModal(){
     tab.addEventListener('click', () => setModalTipo(tab.dataset.modalTipo));
   });
 
+  ['f_servicio', 'f_check_url', 'f_nombre'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateSummary);
+  });
+
   const form = document.getElementById('serviceForm');
   if (form) form.addEventListener('submit', conectarServicio);
-}
 
-function abrirModal(tipo = 'bot'){
-  const modal = document.getElementById('serviceModal');
-  if (!modal) return;
-  setModalTipo(tipo);
-  ocultarError();
-  modal.classList.add('is-open');
-  modal.setAttribute('aria-hidden', 'false');
-  const nombre = document.getElementById('f_nombre');
-  if (nombre) {
-    nombre.value = '';
-    setTimeout(() => nombre.focus(), 30);
-  }
-}
-
-function cerrarModal(){
-  const modal = document.getElementById('serviceModal');
-  if (!modal) return;
-  modal.classList.remove('is-open');
-  modal.setAttribute('aria-hidden', 'true');
+  updateSummary();
 }
 
 function setModalTipo(tipo){
@@ -486,8 +474,79 @@ function setModalTipo(tipo){
     tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
 
-  const urlField = document.getElementById('f_checkUrlField');
-  if (urlField) urlField.classList.toggle('is-hidden', tipo !== 'web');
+  const control = document.getElementById('controlWeb');
+  if (control) control.classList.toggle('is-hidden', tipo !== 'web');
+
+  const hint = document.getElementById('hintServicio');
+  if (hint) {
+    hint.innerHTML = tipo === 'bot'
+      ? 'con unidad: podrás <strong>iniciar, detener, reiniciar y leer logs</strong>; sin unidad, el servicio solo queda registrado (se verá offline).'
+      : 'si este servicio está bajo systemd también podrás <strong>iniciarlo, detenerlo y ver logs</strong>; sin unidad, solo se mostrará su estado por HTTP.';
+  }
+
+  updateSummary();
+}
+
+/* resumen en vivo: qué se podrá hacer con este servicio */
+function updateSummary(){
+  const servicio = (document.getElementById('f_servicio')?.value || '').trim();
+  const check = (document.getElementById('f_check_url')?.value || '').trim();
+  const tieneUnidad = !!servicio;
+  const tieneCheck = !!check;
+
+  let estado, acciones;
+  if (modalTipo === 'bot'){
+    estado = tieneUnidad
+      ? 'en línea / offline según la unidad systemd'
+      : 'offline · sin unidad que comprobar';
+    acciones = tieneUnidad
+      ? 'iniciar · detener · reiniciar · logs'
+      : 'solo registro (sin acciones)';
+  } else {
+    estado = tieneCheck
+      ? 'en línea si responde (HTTP < 400)'
+      : 'offline · sin dirección que comprobar';
+    acciones = tieneUnidad
+      ? 'iniciar · detener · reiniciar · logs'
+      : tieneCheck
+        ? 'solo estado (por HTTP)'
+        : 'solo registro (sin acciones)';
+  }
+
+  const e = document.getElementById('sumEstado');
+  if (e) e.textContent = estado;
+  const a = document.getElementById('sumAcciones');
+  if (a) a.textContent = acciones;
+}
+
+function abrirModal(tipo = 'bot'){
+  const modal = document.getElementById('serviceModal');
+  if (!modal) return;
+
+  ['f_nombre', 'f_servicio', 'f_check_url', 'f_comando', 'f_ruta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['f_auto_inicio', 'f_auto_reinicio'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+
+  setModalTipo(tipo);
+  ocultarError();
+  updateSummary();
+
+  modal.classList.add('is-open');
+  modal.setAttribute('aria-hidden', 'false');
+  const nombre = document.getElementById('f_nombre');
+  if (nombre) setTimeout(() => nombre.focus(), 30);
+}
+
+function cerrarModal(){
+  const modal = document.getElementById('serviceModal');
+  if (!modal) return;
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
 }
 
 function mostrarError(mensaje){
@@ -543,6 +602,9 @@ async function conectarServicio(event){
     await estado.cargar();
     renderServicios();
     poblarTerminalSelect();
+
+    // llévate al panel para ver la tarjeta recién creada
+    window.location.hash = '#/servicios';
   } catch (error) {
     mostrarError(`no se pudo conectar el servicio: ${error.message}`);
   } finally {
@@ -750,4 +812,270 @@ function escribirTerminal(texto){
 function scrollTerminal(){
   const body = document.getElementById('termBody');
   if (body) body.scrollTop = body.scrollHeight;
+}
+
+/* ==========================================================
+   Conexión y servidores remotos (agentes Lumina)
+   ========================================================== */
+
+let conexionTimer = null;
+
+async function cargarConexion(primera = true){
+  const badge = document.getElementById('connState');
+  if (primera && badge) badge.classList.add('conn--checking');
+
+  try {
+    const datos = await api('/api/conexion');
+    renderIndicadorConexion(datos);
+    renderVistaConexion(datos);
+  } catch (error) {
+    // Sin acceso al servidor principal no inventamos conexiones:
+    // se marca el corte y los datos siguen donde quedaron.
+    renderIndicadorConexion(null, error.message);
+  }
+
+  if (!conexionTimer) {
+    conexionTimer = setInterval(() => cargarConexion(false), 15000);
+  }
+}
+
+/* ---------- indicador global en la barra lateral ---------- */
+function renderIndicadorConexion(datos, error){
+  const badge = document.getElementById('connState');
+  const texto = document.getElementById('connText');
+  if (!badge || !texto) return;
+
+  let clase, mensaje, titulo;
+
+  if (!datos){
+    clase = 'conn--off';
+    mensaje = 'sin acceso al servidor principal';
+    titulo = `no se pudo contactar la API local (${error || 'error desconocido'}). Sin conexión no hay datos en vivo.`;
+  } else {
+    const { total_remotos, conectado_a, sin_acceso_a } = datos;
+    if (total_remotos === 0){
+      clase = 'conn--ok';
+      mensaje = 'conectado · este equipo';
+      titulo = 'conexión establecida con el servidor principal. Aún no hay servidores remotos registrados.';
+    } else if (sin_acceso_a === 0){
+      clase = 'conn--ok';
+      mensaje = `conectado a ${conectado_a + 1} servidores`;
+      titulo = 'servidor principal y todos los remotos responden.';
+    } else if (conectado_a === 0){
+      clase = 'conn--off';
+      mensaje = `sin acceso a ningún servidor remoto`;
+      titulo = `el servidor principal responde, pero ${sin_acceso_a} remoto(s) no se alcanza(n).`;
+    } else {
+      clase = 'conn--warn';
+      mensaje = `sin acceso a ${sin_acceso_a} servidor(es)`;
+      titulo = `el principal y ${conectado_a} remoto(s) responden; ${sin_acceso_a} no se alcanza(n).`;
+    }
+  }
+
+  badge.classList.remove('conn--checking', 'conn--ok', 'conn--warn', 'conn--off');
+  badge.classList.add(clase);
+  texto.textContent = mensaje;
+  badge.setAttribute('title', titulo);
+}
+
+/* ---------- vista servidores ---------- */
+function initServidores(){
+  const form = document.getElementById('serverForm');
+  if (form) form.addEventListener('submit', registrarServidor);
+
+  const grid = document.getElementById('servidoresGrid');
+  if (grid){
+    grid.addEventListener('click', async (event) => {
+      const btn = event.target.closest('[data-sop]');
+      if (!btn) return;
+      const card = btn.closest('.card[data-id]');
+      if (!card) return;
+
+      const id = card.dataset.id;
+      const nombre = card.querySelector('h3')?.textContent?.trim() || 'servidor';
+      try {
+        await api(`/api/servidores/${id}`, { method: 'DELETE' });
+        logEvent(`se dejó de gestionar <strong>${escapar(nombre)}</strong>`, 'ok');
+        await cargarConexion(false);
+      } catch (error) {
+        logEvent(`error al quitar <strong>${escapar(nombre)}</strong>: ${escapar(error.message)}`, 'warn');
+      }
+    });
+  }
+}
+
+async function registrarServidor(event){
+  event.preventDefault();
+
+  const nombre = document.getElementById('sv_nombre')?.value.trim() || '';
+  const url = document.getElementById('sv_url')?.value.trim() || '';
+  if (!nombre || !url) return;
+
+  const submit = event.target.querySelector('[type="submit"]');
+  if (submit){
+    submit.disabled = true;
+    const icon = submit.querySelector('.btn-icon');
+    if (icon) icon.textContent = '…';
+  }
+
+  try {
+    const creado = await api('/api/servidores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre,
+        url,
+        token: document.getElementById('sv_token')?.value.trim() || '',
+      }),
+    });
+
+    logEvent(
+      `servidor remoto <strong>${escapar(creado.nombre)}</strong> registrado · conexión: <strong>${creado.conexion ? 'alcanzable' : 'sin acceso'}</strong>`,
+      creado.conexion ? 'ok' : 'warn'
+    );
+
+    ['sv_nombre', 'sv_url', 'sv_token'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    await cargarConexion(false);
+  } catch (error) {
+    logEvent(`no se pudo registrar el servidor: ${escapar(error.message)}`, 'warn');
+  } finally {
+    if (submit){
+      submit.disabled = false;
+      const icon = submit.querySelector('.btn-icon');
+      if (icon) icon.textContent = '+';
+    }
+  }
+}
+
+function renderVistaConexion(datos){
+  // tarjetas de conexión (principal + remotos)
+  const conex = document.getElementById('conexionGrid');
+  if (conex){
+    conex.innerHTML = '';
+    conex.appendChild(tarjetaPrincipal());
+
+    if (datos.servidores.length){
+      datos.servidores.forEach(s => conex.appendChild(tarjetaConexion(s)));
+    } else {
+      conex.appendChild(tarjetaVacia(
+        'no hay servidores remotos',
+        'registra uno arriba y Lumina lo comprobará cada 15 segundos.'
+      ));
+    }
+  }
+
+  // resumen compacto
+  const resumen = document.getElementById('connResumen');
+  if (resumen){
+    const { total_remotos, conectado_a, sin_acceso_a } = datos;
+    resumen.textContent = total_remotos === 0
+      ? 'solo este equipo'
+      : sin_acceso_a === 0
+        ? `${total_remotos} ${total_remotos === 1 ? 'remoto' : 'remotos'} conectados`
+        : `${conectado_a} conectados · ${sin_acceso_a} sin acceso`;
+  }
+
+  // lista de registrados con sus acciones
+  const grid = document.getElementById('servidoresGrid');
+  if (grid){
+    grid.innerHTML = '';
+    if (datos.servidores.length){
+      datos.servidores.forEach(s => grid.appendChild(tarjetaRegistrado(s)));
+    } else {
+      grid.appendChild(tarjetaVacia(
+        'sin servidores registrados',
+        'las tarjetas de arriba muestran la conexión; aquí aparecen los que puedas quitar.'
+      ));
+    }
+  }
+}
+
+function tarjetaPrincipal(){
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">
+        <span class="card-icon">🖥️</span>
+        <div>
+          <h3>servidor principal</h3>
+          <p class="card-sub">este equipo · el panel se sirve aquí</p>
+        </div>
+      </div>
+      <span class="status-pill status-pill--online"><span class="pulse"></span> conectado</span>
+    </div>
+    <dl class="card-stats">
+      <div><dt>acceso</dt><dd>directo · su propia API</dd></div>
+      <div><dt>servicios</dt><dd>los de este equipo</dd></div>
+    </dl>
+  `;
+  return card;
+}
+
+function tarjetaConexion(s){
+  const ok = s.conexion;
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">
+        <span class="card-icon">🌍</span>
+        <div>
+          <h3>${escapar(s.nombre)}</h3>
+          <p class="card-sub">${escapar(s.url)}</p>
+        </div>
+      </div>
+      <span class="status-pill status-pill--${ok ? 'online' : 'offline'}">
+        <span class="pulse"></span> ${ok ? 'conectado' : 'sin acceso'}
+      </span>
+    </div>
+    <dl class="card-stats">
+      <div><dt>estado</dt><dd>${escapar(s.detalle)}</dd></div>
+      <div><dt>comprobado</dt><dd>${formatearHora(s.ultimo_check)}</dd></div>
+    </dl>
+  `;
+  return card;
+}
+
+function tarjetaRegistrado(s){
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.dataset.id = s.id;
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">
+        <span class="card-icon">🌍</span>
+        <div>
+          <h3>${escapar(s.nombre)}</h3>
+          <p class="card-sub">${escapar(s.url)}</p>
+        </div>
+      </div>
+      <span class="status-pill status-pill--${s.conexion ? 'online' : 'offline'}">
+        <span class="pulse"></span> ${s.conexion ? 'alcanzable' : 'sin acceso'}
+      </span>
+    </div>
+    <div class="card-actions">
+      <button class="btn-ghost is-danger" data-sop="eliminar">quitar</button>
+    </div>
+  `;
+  return card;
+}
+
+function tarjetaVacia(titulo, sub){
+  const vacio = document.createElement('article');
+  vacio.className = 'card card--empty is-visible';
+  vacio.innerHTML = `
+    <p class="card-empty-title">${titulo}</p>
+    <p class="card-empty-sub">${sub}</p>
+  `;
+  return vacio;
+}
+
+function formatearHora(iso){
+  if (!iso) return '—';
+  const fecha = new Date(iso);
+  return isNaN(fecha) ? '—' : fecha.toLocaleTimeString('es-CO', { hour12: false });
 }

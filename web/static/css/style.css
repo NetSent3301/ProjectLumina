@@ -702,35 +702,97 @@ a:focus-visible, button:focus-visible{
 }
 .modal-x:hover{ color: var(--text); background: var(--navy-600); }
 
-#serviceForm{ padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 14px; }
+#serviceForm{ padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 16px; }
 
-.modal-tabs{
-  display: inline-flex;
-  gap: 4px;
-  align-self: flex-start;
-  padding: 4px;
-  border-radius: 999px;
-  background: var(--navy-800);
-  border: 1px solid var(--border-soft);
+/* secciones numeradas */
+.form-group{ display: flex; flex-direction: column; gap: 10px; }
+.form-group-title{
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--muted);
 }
-.modal-tab{
+.form-group-title .opt{
+  color: var(--muted-2);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: 10.5px;
+}
+.step{
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-hi);
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  flex-shrink: 0;
+}
+
+/* resumen en vivo de cómo se gestionará */
+.connect-summary{
+  border: 1px solid var(--accent-line);
+  background: linear-gradient(160deg, rgba(139, 124, 248, .08), rgba(91, 157, 219, .08));
+  border-radius: var(--radius-m);
+  padding: 12px 14px;
+}
+.sum-title{
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--accent-hi);
+  margin-bottom: 8px;
+}
+.sum-rows{ display: flex; flex-direction: column; gap: 6px; }
+.sum-row{ display: flex; gap: 12px; font-size: 12.5px; line-height: 1.45; }
+.sum-row dt{ color: var(--muted); width: 66px; flex-shrink: 0; font-weight: 500; }
+.sum-row dd{ color: var(--text-dim); margin: 0; }
+
+.modal-tabs{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  background: none;
   border: none;
-  background: transparent;
+}
+.modal-tab{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  background: var(--navy-800);
   color: var(--muted);
   font-size: 12.5px;
   font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 999px;
-  transition: color .15s ease, background-color .15s ease;
+  padding: 11px 13px;
+  border-radius: var(--radius-m);
+  text-align: left;
+  transition: border-color .15s ease, color .15s ease, background-color .15s ease;
 }
-.modal-tab:hover{ color: var(--text-dim); }
+.modal-tab:hover{ color: var(--text-dim); border-color: var(--border-hi); }
 .modal-tab.is-active{
   color: #10121c;
+  border-color: transparent;
   background: linear-gradient(135deg, var(--glow-violet), var(--glow-blue));
+  box-shadow: 0 8px 18px -10px #8f7cf866;
 }
+.modal-tab.is-active small{ color: rgba(16, 18, 28, .6); }
+.modal-tab-ico{ font-size: 16px; }
+.modal-tab-text{ display: flex; flex-direction: column; gap: 1px; }
+.modal-tab-text strong{ font-weight: 600; }
+.modal-tab-text small{ font-size: 11px; color: var(--muted-2); line-height: 1.3; }
 
 .field{ display: flex; flex-direction: column; gap: 6px; }
 .field-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -742,6 +804,7 @@ a:focus-visible, button:focus-visible{
   color: var(--muted);
 }
 .field-label em{ color: var(--danger); font-style: normal; }
+.field-label em.opt{ color: var(--muted-2); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 2px; }
 .field-input{
   font-family: var(--font-sans);
   font-size: 13.5px;
@@ -758,7 +821,8 @@ a:focus-visible, button:focus-visible{
   border-color: var(--accent-hi);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
-.field-hint{ font-size: 11px; color: var(--muted-2); line-height: 1.45; }
+.field-hint{ display: block; font-size: 11px; color: var(--muted-2); line-height: 1.45; }
+.field-hint strong{ color: var(--text-dim); font-weight: 500; }
 
 .field-checks{ display: flex; gap: 18px; }
 .check{

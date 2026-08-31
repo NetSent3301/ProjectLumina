@@ -16,7 +16,7 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api import servidor, servicios
+from .api import servidor, servidores, servicios
 from .api.auth import require_token
 from .config import get_settings
 from .db import init_db
@@ -62,6 +62,12 @@ def create_app() -> FastAPI:
         servidor.router,
         prefix="/api",
         tags=["servidor"],
+        dependencies=[Depends(require_token)],
+    )
+    app.include_router(
+        servidores.router,
+        prefix="/api",
+        tags=["servidores"],
         dependencies=[Depends(require_token)],
     )
 
