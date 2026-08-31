@@ -1,0 +1,90 @@
+# ProjectLumina — docker-compose para homelab
+#
+# Dos perfiles:
+#   1) Panel central (donde ves la UI y agregas servidores remotos)
+#      docker compose --profile panel up -d
+#
+#   2) Agente en cada máquina del homelab (gestiona systemd local)
+#      docker compose --profile agente up -d
+#
+# Uso típico:
+#   - En tu máquina: panel
+#   - En cada server del homelab: agente
+#   - En el panel (vista "servidores") registras cada agente con su IP:puerto y token
+
+services:
+  # ──────────────────────────────────────────────
+  # Panel central: solo sirve la UI y su API local
+  # No necesita acceso a systemd del host
+  # ──────────────────────────────────────────────
+  panel:
+    profiles: ["panel"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: luminia-panel
+    restart: unless-stopped
+    ports:
+      - "${LUMINA_PORT:-8127}:8127"
+    environment:
+      - LUMINA_HOST=0.0.0.0
+      - LUMINA_PORT=8127
+      - LUMINA_DB=/app/data/lumina.db
+      - LUMINA_TOKEN=${LUMINA_TOKEN:-}
+      - LUMINA_DEBUG=${LUMINA_DEBUG:-false}
+    volumes:
+      - ./data:/app/data
+    networks:
+      - luminia_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8127/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ──────────────────────────────────────────────
+  # Agente: corre en cada server del homelab
+  # Necesita acceso a systemd/journalctl del host
+  # ──────────────────────────────────────────────
+  agente:
+    profiles: ["agente"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: luminia-agente
+    restart: unless-stopped
+    # Para acceder a systemd del host:
+    pid: "host"
+    privileged: true
+    # Montajes necesarios para systemctl/journalctl:
+    volumes:
+      - /run/systemd:/run/systemd:ro
+      - /var/run/dbus:/var/run/dbus:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./data:/app/data
+    environment:
+      - LUMINA_HOST=0.0.0.0
+      - LUMINA_PORT=8127
+      - LUMINA_DB=/app/data/lumina.db
+      - LUMINA_TOKEN=${LUMINA_TOKEN:-}
+      - LUMINA_DEBUG=${LUMINA_DEBUG:-false}
+    networks:
+      - luminia_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8127/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  luminia_net:
+    driver: bridge
+
+# ──────────────────────────────────────────────
+# Variables de entorno (crea un .env al lado de este archivo)
+# ──────────────────────────────────────────────
+# LUMINA_TOKEN=tu-clave-secreta   # obligatorio si expones a red
+# LUMINA_PORT=8127                # puerto publicado
+# LUMINA_DEBUG=false              # true para logs verbosos
