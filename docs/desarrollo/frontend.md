@@ -36,7 +36,7 @@ El dashboard actual es una **maqueta con estados vacíos** (sin datos falsos) e 
 
 El backend sirve la plantilla y monta la carpeta estática en `/static` con `StaticFiles` → [backend.md](backend.md).
 
-> Rutas del panel: `/` (resumen) y `/servicios` (redirige a `/#/servicios`). La maqueta aún **no consume el backend**: todo corre en memoria y solo registra actividad real (sin datos falsos).
+> Rutas del panel: `/` (resumen) y `/servicios` (redirige a `/#/servicios`). La maqueta aún **no consume el backend**: todo corre en memoria y solo registra actividad real (sin datos falsos). Al iniciar v0.1 se conectará a la API REST → [api.md](api.md).
 
 ### Micro-animaciones
 

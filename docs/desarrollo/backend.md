@@ -22,6 +22,8 @@ Pendiente (cuando se tenga acceso al servidor):
 - ❌ Base de datos y modelos.
 - ❌ Seguridad y exposición a Internet.
 
+> ✅ **Requisitos técnicos cerrados** → [requisitos](../requisitos.md#requisitos-técnicos-definitivos). Dependencias a añadir al iniciar v0.1: `psutil`, `sqlmodel`, `pydantic-settings`.
+
 > Cómo arrancarlo: `bash scripts/run.sh`
 
 ## Responsabilidades

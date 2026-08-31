@@ -65,17 +65,37 @@
 
 ---
 
-## Requisitos técnicos (propuestos)
+## Requisitos técnicos (definitivos)
 
-| Área | Propuesta | Detalle |
-|------|-----------|---------|
-| **Backend** | Python — Flask o FastAPI | Elección final pendiente → [[Decisiones]] |
-| **Frontend** | HTML, CSS, JavaScript | Interfaz web responsive |
-| **API** | REST | WebSockets a futuro → [[API]] |
-| **Base de datos** | SQLite | Migración a PostgreSQL a futuro → [[Base de Datos]] |
+> Stack cerrado para el desarrollo de **[[v0.1]]**. Cambios desde aquí → [[Decisiones]].
+
+| Área | Decisión | Detalle |
+|------|----------|---------|
+| **Backend** | Python + **FastAPI** | Servido con Uvicorn; documentación automática en `/docs` (Swagger) → [[Backend]] |
+| **Frontend** | HTML, CSS, JavaScript vanilla | Una sola página (vistas por hash); la maqueta actual evoluciona → [[Frontend]] |
+| **API** | REST + JSON | Esquema de endpoints definido → [[API]] |
+| **Base de datos** | SQLite (`data/lumina.db`) con **SQLModel** | Modelos tipados; PostgreSQL solo si crece → [[Base de Datos]] |
+| **Métricas** | **psutil** | CPU, RAM, disco, red, uptime, procesos → [[Servidor#Información mostrada]] |
+| **Gestión de servicios** | **systemd** | `systemctl` vía subprocess; plantillas por tipo → [[Servidor]] · [[Control Remoto]] |
+| **Chequeo de webs** | **HTTP** (httpx) | Disponibilidad real mediante petición HTTP → [[Webs#Funciones]] |
+| **Seguridad MVP** | **Token de API** | `X-API-Key` / Bearer desde entorno; HTTPS al exponer → [[Autenticacion]] |
+| **Configuración** | Entorno + **pydantic-settings** | Variables `LUMINA_*` desde `.env` |
 | **SO servidor** | Debian 13 | → [[Debian]] |
 | **Gestión de servicios** | systemd | → [[systemd]] |
 | **Control de versiones** | Git + GitHub | → [[Git y GitHub]] |
+
+### Dependencias a añadir al iniciar v0.1
+
+- `psutil` — métricas del sistema.
+- `sqlmodel` — modelos de base de datos.
+- `pydantic-settings` — configuración desde entorno.
+- `httpx` — ya está en `requirements.txt` (chequeo HTTP de webs y pruebas).
+
+### Reglas del MVP
+
+- Administrar **un bot y una web** sobre Debian 13.
+- **Sin agente**, sin WebSockets y sin multiusuario: REST por polling (simpleza inicial) → [[Principios Tecnicos]].
+- Toda ejecución remota se trata como **operación privilegiada** → [[Seguridad]].
 
 ---
 

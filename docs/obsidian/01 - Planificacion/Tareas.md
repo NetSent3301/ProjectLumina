@@ -11,10 +11,10 @@
 - [x] Redactar visión y objetivos → [[Vision]] · [[Objetivos]].
 - [x] Definir arquitectura general del MVP → [[Arquitectura]].
 - [x] Documentar estructura recomendada para Obsidian (este mapa).
-- [ ] Definir requisitos técnicos finales → [[Requisitos]].
-- [ ] Elegir Flask vs FastAPI → [[Decisiones]].
-- [ ] Definir arquitectura definitiva del MVP → [[Arquitectura]].
-- [ ] Estructurar el repositorio → [[Git y GitHub]] · [[Arquitectura#Estructura del código]].
+- [x] Definir requisitos técnicos finales → [[Requisitos#Requisitos técnicos (definitivos)]].
+- [x] Elegir Flask vs FastAPI → [[Decisiones#Backend con FastAPI]].
+- [x] Definir arquitectura definitiva del MVP → [[Arquitectura#Arquitectura definitiva del MVP|Arquitectura definitiva del MVP]].
+- [x] Decidir la estructura del repositorio → [[Arquitectura#Estructura del código]] (se aplica al iniciar v0.1).
 
 ---
 

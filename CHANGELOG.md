@@ -17,8 +17,12 @@ Todos los cambios notables de ProjectLumina se documentarán en este archivo.
 - Script de arranque `scripts/run.sh` (crea venv, instala dependencias y arranca).
 - Test básico del endpoint (`pruebas/test_health.py`).
 - Entorno virtual `.venv` y `requirements.txt` (fastapi, uvicorn, pytest, httpx).
-- Formato `.env.example` con variables opcionales.
+- Formato `.env.example` con variables opcionales (incluye `LUMINA_TOKEN`).
 - Repositorio Git inicializado (rama `main`).
+- Logo **LUMINA** en la sidebar (blanco con glow de acento y palpitación sutil que respeta `prefers-reduced-motion`).
+- **Requisitos técnicos cerrados**: stack definitivo, esquema de endpoints v0.1 y modelo de datos → [requisitos.md](docs/requisitos.md#requisitos-técnicos-definitivos) · [api.md](docs/desarrollo/api.md) · [base-de-datos.md](docs/desarrollo/base-de-datos.md).
+- **Arquitectura definitiva del MVP** (estructura `app/` en capas, flujo de acciones, despliegue systemd y transición desde `lumina.py`) → [arquitectura.md](docs/arquitectura.md#arquitectura-definitiva-del-mvp).
+- README renovado: resumen, stack definitivo, estructura del proyecto, inicio rápido y estado por fases.
 
 ### Cambiado
 - Frontend reorganizado: `web/index.html` → `web/templates/index.html`; CSS, JS y assets en `web/static/`.

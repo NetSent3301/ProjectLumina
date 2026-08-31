@@ -4,7 +4,7 @@
 
 ## Índice
 
-- [Backend](backend.md) — Python, Flask o FastAPI.
+- [Backend](backend.md) — Python, FastAPI.
 - [Frontend](frontend.md) — HTML, CSS, JavaScript, responsive.
 - [API](api.md) — Comunicación REST.
 - [Base de datos](base-de-datos.md) — SQLite → PostgreSQL.

@@ -49,17 +49,36 @@ Inicialmente NO se priorizará:
 - Infraestructura externa compleja.
 - Arquitectura para miles de servidores.
 
-## Requisitos técnicos (propuestos)
+## Requisitos técnicos (definitivos)
 
-| Área | Propuesta | Notas |
-|------|-----------|-------|
-| Backend | Python — Flask o FastAPI | Elección final pendiente |
-| Frontend | HTML, CSS, JavaScript | Interfaz responsive |
-| API | REST | WebSockets a futuro |
-| Base de datos | SQLite | Migración a PostgreSQL a futuro |
+> Stack cerrado para el desarrollo de **v0.1**. Cambios de aquí en adelante → [decisiones](obsidian/06%20-%20Registro/Decisiones.md).
+
+| Área | Decisión | Detalle |
+|------|----------|---------|
+| Backend | Python + **FastAPI** | Servido con Uvicorn; documentación automática en `/docs` (Swagger) |
+| Frontend | HTML, CSS, JavaScript vanilla | Una sola página (vistas por hash); la maqueta actual evoluciona |
+| API | **REST + JSON** | Esquema de endpoints definido → [api](desarrollo/api.md) |
+| Base de datos | **SQLite** (`data/lumina.db`) con **SQLModel** | Modelos tipados; PostgreSQL solo si el proyecto crece |
+| Métricas | **psutil** | CPU, RAM, disco, red, uptime, procesos |
+| Gestión de servicios | **systemd** | `systemctl` vía subprocess; plantillas por tipo de servicio |
+| Chequeo de webs | **HTTP** (httpx) | Disponibilidad real mediante petición HTTP |
+| Seguridad MVP | **Token de API** | Header `X-API-Key` / Bearer desde entorno; HTTPS al exponer a Internet |
+| Configuración | Entorno + **pydantic-settings** | Variables `LUMINA_*` desde `.env` |
 | SO servidor | Debian 13 | |
-| Gestión de servicios | systemd | |
 | Control de versiones | Git + GitHub | |
+
+### Dependencias a añadir al iniciar v0.1
+
+- `psutil` — métricas del sistema.
+- `sqlmodel` — modelos de base de datos.
+- `pydantic-settings` — configuración desde entorno.
+- `httpx` — ya está en `requirements.txt` (chequeo HTTP de webs y pruebas).
+
+### Reglas del MVP
+
+- Administrar **un bot y una web** sobre Debian 13.
+- **Sin agente**, sin WebSockets y sin multiusuario: REST por polling (simpleza inicial).
+- Toda ejecución remota se trata como **operación privilegiada** → [seguridad](seguridad.md).
 
 ## Requisitos no funcionales
 

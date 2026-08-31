@@ -38,6 +38,12 @@ La **ejecución remota de comandos** es una capacidad sensible y debe protegerse
 ### MVP
 No habrá sistema de usuarios. ProjectLumina será una herramienta personal del propietario del servidor.
 
+La API se protege con un **token de API**:
+
+- Header `X-API-Key: <token>` (o `Authorization: Bearer <token>`) en todas las rutas salvo `/api/health`.
+- El token se define en la configuración (`LUMINA_TOKEN` desde `.env`) → [configuración](configuracion.md).
+- Si se expone a Internet: **HTTPS obligatorio** (cifrado) además del token → esquema en [api](desarrollo/api.md#autenticación-mvp).
+
 ### Futuro
 - Login.
 - Autenticación.

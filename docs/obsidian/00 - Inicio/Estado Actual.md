@@ -6,9 +6,9 @@
 
 ## Fase actual
 
-**Base del proyecto inicializada y dashboard en maqueta.** 🟢
+**Planificación técnica completada: requisitos y arquitectura del MVP cerrados.** 🟢
 
-La etapa de planificación avanzó, la **base inicial** funciona localmente y el **dashboard web está en maqueta** con estados vacíos (sin datos falsos).
+La etapa de planificación avanzó, la **base inicial** funciona localmente, el **dashboard web está en maqueta** (estados vacíos, sin datos falsos) y ya están **definidos los requisitos técnicos y la arquitectura definitiva del MVP**. Falta el acceso al servidor para iniciar el desarrollo de [[v0.1]].
 
 ---
 
@@ -21,11 +21,13 @@ BASE DEL PROYECTO ✅
      ↓
 DASHBOARD WEB (MAQUETA) ✅
      ↓
-REQUISITOS TÉCNICOS
+REQUISITOS TÉCNICOS ✅
      ↓
-ARQUITECTURA DEFINITIVA DEL MVP
+ARQUITECTURA DEFINITIVA DEL MVP ✅
      ↓
-DESARROLLO v0.1.0
+ESTRUCTURA DEL REPOSITORIO ✅ (decidida)
+     ↓
+DESARROLLO v0.1.0  ← siguiente (requiere servidor)
      ↓
 TESTING
      ↓
@@ -40,13 +42,13 @@ DEPLOY
 
 | Fase | Estado |
 |------|--------|
-| Planificación | ✅ En curso (documentación generada) |
+| Planificación | ✅ Documentación técnica completa |
 | Base del proyecto | ✅ Backend mínimo con FastAPI funcional |
 | Dashboard web (maqueta) | ✅ Interfaz con estados vacíos y micro-animaciones |
-| Requisitos técnicos | ⏳ Pendiente |
-| Arquitectura definitiva MVP | ⏳ Pendiente |
-| Estructura del repositorio | ⏳ Pendiente |
-| Desarrollo v0.1.0 | ⏳ Pendiente |
+| Requisitos técnicos | ✅ **Cerrados** → [[Requisitos#Requisitos técnicos (definitivos)]] |
+| Arquitectura definitiva MVP | ✅ **Cerrada** → [[Arquitectura#Arquitectura definitiva del MVP|Arquitectura definitiva del MVP]] |
+| Estructura del repositorio | ✅ Definida (se aplica al iniciar v0.1) |
+| Desarrollo v0.1.0 | ⏳ Siguiente paso (requiere servidor) |
 | Testing | ⏳ Pendiente |
 | Deploy | ⏳ Pendiente |
 
@@ -64,11 +66,11 @@ A partir de ahí se construirá el resto del sistema.
 
 ## Siguientes acciones sugeridas
 
-1. Definir los **requisitos técnicos** definitivos → [[Requisitos]].
-2. Elegir la **arquitectura definitiva del MVP** → [[Arquitectura]].
-3. Estructurar el **repositorio** → [[Arquitectura#Estructura del código]].
-4. Iniciar el **desarrollo de v0.1** → [[v0.1]] · [[Tareas]].
-5. Conectar el dashboard a **datos reales** cuando haya servidor → [[Frontend#Base actual]].
+1. ✅ Definir los **requisitos técnicos** definitivos → [[Requisitos#Requisitos técnicos (definitivos)]] · [[Decisiones]].
+2. ✅ Cerrar la **arquitectura definitiva del MVP** → [[Arquitectura#Arquitectura definitiva del MVP|Arquitectura definitiva del MVP]].
+3. ✅ Definir la **estructura del repositorio** → [[Arquitectura#Estructura del código]].
+4. (Cuando haya acceso al servidor) iniciar el **desarrollo de v0.1** → [[v0.1]] · [[Tareas]].
+5. Conectar el dashboard a **datos reales** (endpoints definidos) → [[Frontend#Base actual]] · [[API]].
 
 ---
 

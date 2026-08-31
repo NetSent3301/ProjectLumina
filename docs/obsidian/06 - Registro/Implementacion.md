@@ -31,6 +31,8 @@ Corresponde a la fase "Preparar el terreno", previa al desarrollo real de [[v0.1
 - ✅ Script de arranque `scripts/run.sh` → un solo comando para lanzar todo.
 - ✅ Test básico del endpoint → [[Dashboard#Testing]].
 - ✅ Backend con **FastAPI** → [[Decisiones#Backend con FastAPI]].
+- ✅ **Requisitos técnicos cerrados**: stack definitivo, esquema de endpoints y modelo de datos → [[Requisitos#Requisitos técnicos (definitivos)]] · [[API]] · [[Base de Datos]] · [[Decisiones]].
+- ✅ **Arquitectura definitiva del MVP** (capa `app/`, flujo de acciones y despliegue systemd) → [[Arquitectura#Arquitectura definitiva del MVP|Arquitectura definitiva del MVP]].
 
 ---
 
@@ -52,9 +54,10 @@ bash scripts/run.sh
 - ❌ Gestión real de bots (iniciar/detener/reiniciar/estados/logs) → [[Bots]] · [[Acciones de Bots]].
 - ❌ Gestión real de webs → [[Webs]].
 - ❌ Métricas del servidor (CPU/RAM/disco/red) → [[Servidor#Información mostrada]].
-- ❌ Base de datos y modelos → [[Base de Datos]].
-- ❌ Seguridad y exposición a Internet → [[Acceso Remoto]] · [[Autenticacion]].
-- ❌ Separar `lumina.py` en módulos → [[Arquitectura#Estructura del código]] (cuando crezca).
+- ❌ Implementar base de datos y modelos (esquema definido) → [[Base de Datos]].
+- ❌ Implementar autenticación por token y HTTPS (decisión tomada) → [[Autenticacion]] · [[Decisiones#Seguridad MVP con token de API]].
+- ❌ Implementar los endpoints de la API (esquema definido) → [[API#Esquema de endpoints v0.1]].
+- ❌ Migrar `lumina.py` a la estructura `app/` definitiva (inicio de v0.1) → [[Arquitectura#Arquitectura definitiva del MVP|Arquitectura definitiva del MVP]].
 - ❌ Conectar el dashboard a datos reales (reemplazar los estados vacíos) → [[Frontend#Base actual]].
 
 ---

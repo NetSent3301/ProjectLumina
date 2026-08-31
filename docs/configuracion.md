@@ -27,6 +27,7 @@ La configuración se distribuye en:
 | `LUMINA_DB` | Ruta del archivo SQLite | No | `data/lumina.db` |
 | `LUMINA_LOGS` | Directorio de logs | No | `logs/` |
 | `LUMINA_SECRET_KEY` | Clave para sesiones/seguridad | Sí (producción) | *(sin valor)* |
+| `LUMINA_TOKEN` | Token de API para autenticar las peticiones (`X-API-Key`) | Sí (producción) | *(sin valor)* |
 | `LUMINA_DEBUG` | Modo depuración | No | `0` |
 
 > ⚠️ En **producción** (exposición a Internet) activar HTTPS y la clave secreta → [seguridad.md](seguridad.md).

@@ -14,6 +14,13 @@
   - Sidebar, cabeceras y estados vacíos sin datos falsos (sin servicios conectados).
   - Micro-animaciones (entrada escalonada, hover, flotación, registro) → [[UI - Sistema de Diseno]].
 - Servido de archivos estáticos con `StaticFiles` en `/static` → [[Decisiones#Sirviendo estáticos con StaticFiles]].
+- Logo **LUMINA** en la sidebar (blanco con glow de acento + palpitación sutil, `prefers-reduced-motion`) → [[UI - Sistema de Diseno]].
+- **Requisitos técnicos cerrados** → [[Requisitos#Requisitos técnicos (definitivos)]] · [[API#Esquema de endpoints v0.1]] · [[Base de Datos]] · [[Decisiones]].
+  - Stack definitivo: FastAPI, SQLite + SQLModel, psutil, systemd, check HTTP, token de API, pydantic-settings.
+  - Esquema de endpoints v0.1 y modelo de datos (tabla única `servicios`).
+- **Arquitectura definitiva del MVP** cerrada → [[Arquitectura#Arquitectura definitiva del MVP|Arquitectura definitiva del MVP]] · [[Decisiones#Arquitectura definitiva del MVP]].
+  - Estructura `app/` en capas (api · services · system · models · config · db), frontend en `web/`, despliegue como servicio systemd y transición desde `lumina.py`.
+- README renovado → estructura definitiva, stack y estado por fases.
 
 ### Corregido
 - CSS y JS del dashboard no cargaban (404) → [[Errores#CSS y JS del dashboard no cargaban]].

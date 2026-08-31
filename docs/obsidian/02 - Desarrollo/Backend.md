@@ -51,7 +51,7 @@ El backend será responsable de:
 
 ---
 
-## Posible módulos en el código
+## Posibles módulos en el código
 
 Según [[Arquitectura#Estructura del código]]:
 
