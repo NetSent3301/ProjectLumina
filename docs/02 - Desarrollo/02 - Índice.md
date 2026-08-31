@@ -34,3 +34,8 @@
 - [Notificaciones](Notificaciones.md) — Alertas futuras.
 - [Git y GitHub](Git%20y%20GitHub.md) — Control de versiones.
 - [Documentacion](Documentacion.md) — Gestión de la documentación.
+
+## Despliegue
+
+- [Despliegue/Índice](Despliegue/%C3%8Dndice.md) — Guías de puesta en producción.
+  - [Docker](Despliegue/Docker.md) — Imagen slim y Alpine, panel y agente multi-init.
