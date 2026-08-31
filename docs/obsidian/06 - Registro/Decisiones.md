@@ -54,6 +54,22 @@
 - **Relacionado:** [[Backend]] · [[API]] · [[Decisiones#Decisiones pendientes|Decisión: Flask vs FastAPI]].
 - **Estado:** ✅ decidido.
 
+### Frontend vanilla (HTML + CSS + JS)
+- **Contexto:** elegir el stack del frontend del dashboard.
+- **Decisión:** HTML, CSS y JavaScript puros, sin compiladores ni frameworks.
+- **Motivo:** simplicidad inicial → [[Principios Tecnicos#Simplicidad inicial]].
+- **Alternativa:** frameworks (React/Vue) → descartados por ahora; se pueden adoptar si la interfaz crece.
+- **Relacionado:** [[Frontend]] · [[UI - Sistema de Diseno]].
+- **Estado:** ✅ decidido.
+
+### Sirviendo estáticos con StaticFiles
+- **Contexto:** los archivos CSS/JS del dashboard devolvían 404 → [[Errores#CSS y JS del dashboard no cargaban]].
+- **Decisión:** montar `web/static` en `/static` con `app.mount("/static", StaticFiles(...), name="static")` en `lumina.py`.
+- **Motivo:** FastAPI sirve estáticos de forma nativa, sin servidor adicional.
+- **Alternativa:** usar `web/components` con carga manual → descartado; innecesario para el MVP.
+- **Relacionado:** [[Backend]] · [[Frontend#Base actual]] · [[Arquitectura#Estructura del código]].
+- **Estado:** ✅ decidido.
+
 ---
 
 ## Decisiones pendientes

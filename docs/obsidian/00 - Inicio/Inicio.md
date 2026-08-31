@@ -12,12 +12,12 @@
 | 🎯 Definición | [[Definicion Final]] |
 | 📍 Estado actual | [[Estado Actual]] |
 | 🗺️ Plan | [[Roadmap]] · [[Requisitos]] · [[Arquitectura]] · [[Tareas]] |
-| 🛠️ Desarrollo | [[Backend]] · [[Frontend]] · [[API]] · [[Dashboard]] |
+| 🛠️ Desarrollo | [[Backend]] · [[Frontend]] · [[API]] · [[Dashboard]] · [[UI - Sistema de Diseno]] |
 | 📦 Gestión | [[Bots]] · [[Webs]] · [[Servidor]] |
 | 🔐 Seguridad | [[Acceso Remoto]] · [[Autenticacion]] · [[Permisos]] |
 | 📚 Investigación | [[Debian]] · [[Linux]] · [[Redes]] · [[SSH]] · [[systemd]] |
 | 🚀 Versiones | [[v0.1]] · [[v0.2]] · [[v0.3]] |
-| 📒 Registro | [[Changelog]] · [[Errores]] · [[Decisiones]] |
+| 📒 Registro | [[Changelog]] · [[Errores]] · [[Decisiones]] · [[Implementacion]] |
 
 ---
 
@@ -42,6 +42,7 @@
 - [[API]] — Comunicación REST.
 - [[Base de Datos]] — Almacenamiento SQLite → PostgreSQL.
 - [[Dashboard]] — Centro de control.
+- [[UI - Sistema de Diseno]] — Tokens, estados y micro-animaciones.
 - [[Bots]] — Gestión de bots. → [[Configuracion de Bots]] · [[Acciones de Bots]] · [[Auto Restart]]
 - [[Webs]] — Gestión de webs. → [[Gestion Avanzada de Webs]]
 - [[Servidor]] — Laptop servidor con Debian 13.

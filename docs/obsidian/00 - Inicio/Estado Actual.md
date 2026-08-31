@@ -6,22 +6,24 @@
 
 ## Fase actual
 
-**Planificación.** 🟡
+**Base del proyecto inicializada y dashboard en maqueta.** 🟢
 
-El proyecto se encuentra en la etapa de planificación, previa a la implementación.
+La etapa de planificación avanzó, la **base inicial** funciona localmente y el **dashboard web está en maqueta** con estados vacíos (sin datos falsos).
 
 ---
 
 ## Siguiente camino
 
 ```text
-PLANIFICACIÓN
+PLANIFICACIÓN ✅
+     ↓
+BASE DEL PROYECTO ✅
+     ↓
+DASHBOARD WEB (MAQUETA) ✅
      ↓
 REQUISITOS TÉCNICOS
      ↓
 ARQUITECTURA DEFINITIVA DEL MVP
-     ↓
-ESTRUCTURA DEL REPOSITORIO
      ↓
 DESARROLLO v0.1.0
      ↓
@@ -39,6 +41,8 @@ DEPLOY
 | Fase | Estado |
 |------|--------|
 | Planificación | ✅ En curso (documentación generada) |
+| Base del proyecto | ✅ Backend mínimo con FastAPI funcional |
+| Dashboard web (maqueta) | ✅ Interfaz con estados vacíos y micro-animaciones |
 | Requisitos técnicos | ⏳ Pendiente |
 | Arquitectura definitiva MVP | ⏳ Pendiente |
 | Estructura del repositorio | ⏳ Pendiente |
@@ -61,15 +65,16 @@ A partir de ahí se construirá el resto del sistema.
 ## Siguientes acciones sugeridas
 
 1. Definir los **requisitos técnicos** definitivos → [[Requisitos]].
-2. Elegir **Flask vs FastAPI** → [[Decisiones]].
-3. Fijar la **arquitectura definitiva del MVP** → [[Arquitectura]].
-4. Estructurar el **repositorio** → [[Arquitectura#Estructura del código]].
-5. Iniciar el **desarrollo de v0.1** → [[v0.1]] · [[Tareas]].
+2. Elegir la **arquitectura definitiva del MVP** → [[Arquitectura]].
+3. Estructurar el **repositorio** → [[Arquitectura#Estructura del código]].
+4. Iniciar el **desarrollo de v0.1** → [[v0.1]] · [[Tareas]].
+5. Conectar el dashboard a **datos reales** cuando haya servidor → [[Frontend#Base actual]].
 
 ---
 
 ## Relacionado
 
+- [[Implementacion]] · Qué está hecho y qué falta.
 - [[Tareas]] · Gestión de tareas.
 - [[Objetivos]] · Objetivo inmediato.
 - [[Roadmap]] · El plan.

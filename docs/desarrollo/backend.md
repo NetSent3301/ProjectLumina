@@ -13,7 +13,7 @@ La base del backend ya está montada en `lumina.py` (un único archivo):
 
 - ✅ Servidor FastAPI arrancable.
 - ✅ Endpoint `GET /api/health` de verificación.
-- ✅ Sirve la página `web/index.html` en la raíz `/`.
+- ✅ Sirve la página `web/templates/index.html` en la raíz `/` (una sola página, vistas por hash).
 
 Pendiente (cuando se tenga acceso al servidor):
 

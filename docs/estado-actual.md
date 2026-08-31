@@ -6,9 +6,9 @@
 
 ## Fase actual
 
-**Base del proyecto inicializada.** 🟢
+**Base del proyecto inicializada y dashboard en maqueta.** 🟢
 
-La etapa de planificación avanzó y la **base inicial** ya está montada y funciona localmente (sin servidor). Se pasó de solo documentación a tener un backend mínimo ejecutable con **FastAPI**.
+La etapa de planificación avanzó y la **base inicial** ya está montada y funciona localmente (sin servidor). Además, se construyó una **maqueta del dashboard web** con estados vacíos (sin datos falsos), a la espera de conectar datos reales.
 
 > Detalles en [implementación (obsidian)](../docs/obsidian/06%20-%20Registro/Implementacion.md)
 
@@ -19,11 +19,12 @@ La etapa de planificación avanzó y la **base inicial** ya está montada y func
 ```mermaid
 flowchart TD
     A[Planificación] --> B[Base del proyecto ✅]
-    B --> C[Requisitos técnicos]
-    C --> D[Arquitectura definitiva del MVP]
-    D --> E[Desarrollo v0.1.0]
-    E --> F[Testing]
-    F --> G[Deploy]
+    B --> C[Dashboard web en maqueta ✅]
+    C --> D[Requisitos técnicos]
+    D --> E[Arquitectura definitiva del MVP]
+    E --> F[Desarrollo v0.1.0]
+    F --> G[Testing]
+    G --> H[Deploy]
 ```
 
 ---
@@ -36,6 +37,7 @@ flowchart TD
 |------|--------|
 | Planificación | ✅ Documentación generada |
 | Base del proyecto | ✅ Backend mínimo con FastAPI, arranca y verifica conectividad |
+| Dashboard web (maqueta) | ✅ Interfaz con estados vacíos y micro-animaciones (sin datos reales) |
 | Requisitos técnicos | ⏳ Pendiente |
 | Arquitectura definitiva MVP | ⏳ Pendiente |
 | Desarrollo v0.1.0 | ⏳ Pendiente (requiere acceso al servidor) |
@@ -56,9 +58,10 @@ A partir de ahí se construirá el resto del sistema.
 
 1. ✅ Elegir backend → **FastAPI**.
 2. ✅ Estructurar el repositorio y montar la base ejecutable.
-3. Definir los **requisitos técnicos** definitivos.
-4. Fijar la **arquitectura definitiva del MVP**.
-5. (Cuando se recupere acceso al servidor) iniciar el **desarrollo de v0.1**: gestión de bots/webs.
+3. ✅ Montar una maqueta del dashboard web (interfaz, estáticos servidos, micro-animaciones).
+4. Definir los **requisitos técnicos** definitivos.
+5. Fijar la **arquitectura definitiva del MVP**.
+6. (Cuando se recupere acceso al servidor) iniciar el **desarrollo de v0.1**: gestión de bots/webs.
 
 ---
 

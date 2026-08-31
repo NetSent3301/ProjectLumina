@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumina · Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<div class="bg-field" aria-hidden="true"></div>
+
+<div class="shell">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="static/assets/LUMINA.png" alt="Lumina" class="brand-logo">
+    </div>
+
+    <nav class="nav">
+      <a href="#/resumen" class="nav-item is-active" data-view="resumen">
+        <span class="nav-dot"></span> resumen
+      </a>
+      <a href="#/servicios" class="nav-item" data-view="servicios">
+        <span class="nav-dot"></span> servicios
+      </a>
+      <a href="#/registro" class="nav-item" data-view="registro">
+        <span class="nav-dot"></span> registro
+      </a>
+      <a href="#/ajustes" class="nav-item" data-view="ajustes">
+        <span class="nav-dot"></span> ajustes
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span id="clock">00:00:00</span>
+      <span class="sidebar-footer-sep">·</span>
+      <span>v0.1.0</span>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- Vista: resumen -->
+    <section class="view is-active" data-view="resumen">
+
+      <header class="topbar">
+        <div>
+          <h1>resumen</h1>
+          <p class="topbar-sub">sin servicios registrados</p>
+        </div>
+        <button class="btn btn-primary" id="refreshBtn">
+          <span class="btn-icon">⟳</span> actualizar estado
+        </button>
+      </header>
+
+      <!-- Services -->
+      <section class="section">
+        <div class="section-head">
+          <h2>servicios</h2>
+          <button class="link-btn" id="addServiceLink">+ añadir servicio</button>
+        </div>
+
+        <div class="cards">
+
+          <article class="card card--empty is-visible" id="emptyServiceCard">
+            <p class="card-empty-icon">＋</p>
+            <p class="card-empty-title">conectar un servicio</p>
+            <p class="card-empty-sub">cuando el servidor esté conectado podrás registrar bots, webs y procesos systemd para administrarlos desde aquí</p>
+            <span class="chip">disponible en v0.1</span>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Activity log -->
+      <section class="section">
+        <div class="section-head">
+          <h2>actividad reciente</h2>
+        </div>
+        <ul class="log" id="logList">
+          <li class="log-empty" id="logEmpty">sin actividad todavía</li>
+        </ul>
+      </section>
+
+    </section>
+
+    <!-- Vista: servicios -->
+    <section class="view" data-view="servicios">
+
+      <header class="topbar">
+        <div>
+          <h1>servicios</h1>
+          <p class="topbar-sub">aún no hay servicios conectados</p>
+        </div>
+        <button class="btn btn-primary" id="addServiceBtn">
+          <span class="btn-icon">+</span> añadir servicio
+        </button>
+      </header>
+
+      <!-- Selector bots / webs -->
+      <section class="section">
+        <div class="section-head">
+          <div class="tabs" role="tablist" aria-label="Tipo de servicio">
+            <button class="tab is-active" data-type="bot" role="tab" aria-selected="true">
+              <span class="tab-icon">🤖</span> bots
+            </button>
+            <button class="tab" data-type="web" role="tab" aria-selected="false">
+              <span class="tab-icon">🌐</span> webs
+            </button>
+          </div>
+          <span class="tab-count" id="tabCount">0 bots</span>
+        </div>
+
+        <div class="cards" id="servicesGrid">
+
+          <article class="card card--empty is-visible" id="emptyBots" data-type-panel="bot">
+            <p class="card-empty-icon">🤖</p>
+            <p class="card-empty-title">ningún bot registrado</p>
+            <p class="card-empty-sub">cuando el servidor esté conectado podrás registrar aquí tus bots (discord, telegram, procesos de python…) para iniciarlos, detenerlos y ver sus logs</p>
+            <span class="chip">disponible en v0.1</span>
+          </article>
+
+          <article class="card card--empty" id="emptyWebs" data-type-panel="web">
+            <p class="card-empty-icon">🌐</p>
+            <p class="card-empty-title">ninguna web registrada</p>
+            <p class="card-empty-sub">cuando el servidor esté conectado podrás registrar aquí tus sitios y apps (fastapi, nginx, static…) para administrarlos desde este panel</p>
+            <span class="chip">disponible en v0.1</span>
+          </article>
+
+        </div>
+      </section>
+
+    </section>
+
+    <!-- Vista: registro (próximamente) -->
+    <section class="view" data-view="registro">
+      <header class="topbar">
+        <div>
+          <h1>registro</h1>
+          <p class="topbar-sub">próximamente en v0.1</p>
+        </div>
+      </header>
+    </section>
+
+    <!-- Vista: ajustes (próximamente) -->
+    <section class="view" data-view="ajustes">
+      <header class="topbar">
+        <div>
+          <h1>ajustes</h1>
+          <p class="topbar-sub">próximamente en v0.1</p>
+        </div>
+      </header>
+    </section>
+
+  </main>
+</div>
+
+<script src="static/js/script.js"></script>
+</body>
+</html>

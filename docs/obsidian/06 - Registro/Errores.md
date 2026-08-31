@@ -29,7 +29,21 @@ Para cada error añade una entrada como la siguiente:
 
 ## Errores resueltos
 
-> _(Ninguno por ahora)_
+### [2026-08-30] - CSS y JS del dashboard no cargaban
+- **Severidad:** Alta (el panel aparecía sin estilos).
+- **Estado:** Resuelto.
+- **Contexto:** frontend reorganizado a `web/templates/` + `web/static/`; `lumina.py` solo servía `/`, `/favicon.ico` y `/api/health`.
+- **Causa:** los archivos estáticos no estaban montados; `/static/css/style.css` y `/static/js/script.js` devolvían 404.
+- **Solución:** montar la carpeta estática con `app.mount("/static", StaticFiles(...), name="static")` → [[Decisiones#Sirviendo estáticos con StaticFiles]].
+- **Relacionado:** [[Frontend]] · [[Backend]] · [[Implementacion]].
+
+### [2026-08-30] - Datos de ejemplo en la UI del dashboard
+- **Severidad:** Baja.
+- **Estado:** Resuelto.
+- **Contexto:** la maqueta mostraba servicios, logs y métricas inventadas.
+- **Causa:** datos de ejemplo incrustados en la maqueta para visualizar el diseño.
+- **Solución:** eliminar los datos falsos y usar **estados vacíos** (sin servicios registrados, sin conectar, `—`) → [[Dashboard#Base actual]].
+- **Relacionado:** [[Frontend#Base actual]] · [[Changelog]].
 
 ---
 

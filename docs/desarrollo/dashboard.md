@@ -2,6 +2,25 @@
 
 El **dashboard** será el centro de control de ProjectLumina.
 
+## Base actual (maqueta)
+
+El dashboard web implementado es una **maqueta con estados vacíos** (sin datos falsos) y **una sola página**: la navegación cambia de vista sin recargar (hash `#/resumen`, `#/servicios`). Estructura:
+
+### Vista Resumen (`/`)
+- **Sidebar**: identidad y navegación.
+- **Cabecera**: título, subtítulo de estado ("sin servicios registrados") y botón "actualizar estado".
+- **Sección de servicios**: tarjeta vacía a ancho completo ("conectar un servicio", disponible en v0.1).
+- **Registro de actividad**: lista de eventos con tiempo y nivel (ok/warn), con estado vacío "sin actividad todavía".
+
+### Vista Servicios (`/#/servicios`)
+- **Selector bots / webs**: pestañas con icono y contador por tipo ("0 bots").
+- **Estados vacíos por tipo**: ninguna bot/web registrada, con chip "disponible en v0.1".
+- Botón "añadir servicio" en la cabecera (aviso de que llega en v0.1).
+
+Micro-animaciones: entrada escalonada al cargar, elevaciones al hover, flotación del estado vacío y animación de entradas del registro; todo respeta `prefers-reduced-motion` → [frontend.md](frontend.md).
+
+> Cuando haya datos reales, cada bot y web tendrá su apartado con controles para iniciar, detener, reiniciar y desplegar logs.
+
 ## Organización principal
 
 ```

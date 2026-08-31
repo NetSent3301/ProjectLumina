@@ -4,6 +4,23 @@
 
 ---
 
+## [v0.1.0-dev] - 2026-08-30
+
+### Añadido
+- **Dashboard web en maqueta** → [[Dashboard#Base actual]] · [[Frontend]].
+  - Reestructura del frontend: `web/templates/` + `web/static/` (css, js, assets) → [[Arquitectura#Estructura del código]].
+  - Una sola página con vistas **resumen** (`/`) y **servicios** (`/#/servicios`), con cambio de vista sin recargar.
+  - Vista servicios con **selector bots/webs** (pestañas con icono y contador) → [[Bots]] · [[Webs]].
+  - Sidebar, cabeceras y estados vacíos sin datos falsos (sin servicios conectados).
+  - Micro-animaciones (entrada escalonada, hover, flotación, registro) → [[UI - Sistema de Diseno]].
+- Servido de archivos estáticos con `StaticFiles` en `/static` → [[Decisiones#Sirviendo estáticos con StaticFiles]].
+
+### Corregido
+- CSS y JS del dashboard no cargaban (404) → [[Errores#CSS y JS del dashboard no cargaban]].
+- Datos de ejemplo proyectados en la UI → [[Errores#Datos de ejemplo en la UI del dashboard]].
+
+---
+
 ## [No publicado]
 
 ### Añadido
