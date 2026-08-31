@@ -9,23 +9,25 @@
 | Campo | Valor |
 |-------|-------|
 | **Nombre** | ProjectLumina |
-| **Estado** | Planificación |
+| **Estado** | Desarrollo v0.1 |
 | **Versión inicial** | v0.1.0 |
 | **Tipo** | Proyecto personal de programación, administración de servidores y redes |
-| **Objetivo general** | Crear un centro de control remoto para administrar servidores, bots, webs y servicios |
+| **Objetivo general** | Crear un panel para administrar los servicios, bots, webs y métricas de la máquina donde corre |
 
 ---
 
 ## Idea general
 
-ProjectLumina será un **sistema de administración remota** para una laptop vieja utilizada como servidor.
+ProjectLumina es un **panel de administración** que gestiona **la máquina donde corre**: sistema operativo, servicios systemd, procesos, bots y webs.
 
-La primera versión será una **aplicación web** accesible desde la laptop principal y desde un **iPhone**. Desde ella se podrá:
+La primera versión es una **aplicación web** que se abre en el navegador de esa misma máquina (accesible también por la red local). Desde ella se podrá:
 
-- Consultar el estado del servidor.
+- Consultar el estado de la máquina (CPU, RAM, uptime).
 - Administrar bots.
 - Administrar webs.
-- Ejecutar acciones sin ir físicamente al servidor.
+- Ejecutar acciones (iniciar, detener, reiniciar, logs) sin entrar por consola.
+
+> La **administración remota** (acceso desde otro dispositivo, p. ej. el iPhone) queda como **fase posterior**: primero un producto funcional local, después exponerlo de forma segura.
 
 ### Infraestructura
 

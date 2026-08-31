@@ -7,6 +7,14 @@
 ## [v0.1.0-dev] - 2026-08-30
 
 ### Añadido
+- **UX/UI del dashboard mejorado**:
+  - **Métricas rápidas en Resumen**: tarjetas de CPU, RAM, servicios (activos/totales) y uptime desde `GET /api/servidor`, con barras de uso (color según carga) y refresco cada 10 s mientras la vista está activa.
+  - **Skeleton loaders**: tarjetas animadas mientras conecta con el backend (antes de mostrar los estados vacíos).
+  - **Terminal de logs en la vista Registro**: visor con fondo negro, fuente JetBrains Mono, barra de terminal, selector de servicio con unidad systemd, botones recargar/live (cola cada 4 s) y resaltado de sintaxis (marcas de tiempo, niveles, IPs, URLs).
+  - **Legibilidad**: textos secundarios más claros, títulos de sección y navegación en mayúsculas con tracking.
+  - **Consistencia**: botones primarios con mayor peso tipográfico, estados vacíos con bordes suaves y fondos `navy`.
+- **"Conectar un servicio" funcional**: modal con formulario (tipo bot/web, nombre, unidad systemd, comando, ruta, check HTTP, auto-inicio/reinicio) que registra vía `POST /api/servicios` y refresca el panel al instante. Se abre desde las tarjetas vacías y los botones "+ añadir servicio".
+- **Cambio de orientación**: ProjectLumina pasa a **gestionar la máquina donde corre** (sistema, servicios systemd, bots y webs), funcional de forma local. El acceso remoto (iPhone/otros dispositivos) queda como **fase posterior** → [Estado Actual](../00%20-%20Inicio/Estado%20Actual.md).
 - **Estructura definitiva `app/` aplicada** (backend en capas) → [Arquitectura](../01%20-%20Planificacion/Arquitectura.md):
   - `app/config.py` — configuración con pydantic-settings (prefijo `LUMINA_`, desde `.env`).
   - `app/db.py` — motor SQLite + SQLModel + `init_db()` (tabla `servicios`).

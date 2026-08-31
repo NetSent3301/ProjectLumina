@@ -1,6 +1,6 @@
 # 💡 ProjectLumina
 
-> Centro de control remoto personal: administra tu servidor, bots y webs desde una interfaz web, sin ir físicamente a la máquina.
+> Panel de administración que gestiona **la máquina donde corre**: servicios systemd, bots, webs y métricas del sistema.
 
 ![Estado](https://img.shields.io/badge/estado-v0.1%20en%20desarrollo-yellow) ![Versión](https://img.shields.io/badge/versi%C3%B3n-v0.1.0-blue) ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
@@ -8,16 +8,16 @@
 
 ## 📖 Qué es
 
-**ProjectLumina** administra un servidor (una laptop con **Debian 13**) desde el navegador, accesible desde tu laptop principal y tu **iPhone**.
+**ProjectLumina** administra el equipo donde se ejecuta (sistema operativo, servicios systemd, procesos, bots y webs) desde una interfaz web. Funciona de forma **local**; la administración remota desde otros dispositivos será una fase posterior.
 
-Con Lumina podrás, sin entrar físicamente al servidor:
+Con Lumina podrás, sin entrar por consola:
 
 - 🤖 **Administrar bots**
 - 🌐 **Administrar webs**
 - 🔄 **Iniciar, detener y reiniciar servicios**
-- 📊 **Consultar estados y métricas**
-- 📜 **Ver logs desplegables**
-- ⚡ **Ejecutar acciones remotamente**
+- 📊 **Consultar métricas del sistema** (CPU, RAM, uptime)
+- 📜 **Ver logs** en un terminal integrado
+- ➕ **Registrar servicios desde la interfaz**
 
 ---
 
@@ -31,12 +31,13 @@ Con Lumina podrás, sin entrar físicamente al servidor:
 | Requisitos técnicos | ✅ Cerrados |
 | Arquitectura definitiva del MVP | ✅ Cerrada |
 | Backend v0.1 en capas (`app/`) | ✅ API REST + token + SQLite + tests |
-| Desarrollo v0.1.0 | 🟡 En curso (construcción local) |
-| Deploy | ⏳ Espera el servidor (Dell Inspiron 2010) |
+| Registro de servicios | ✅ Desde la interfaz (modal → `POST /api/servicios`) |
+| Desarrollo v0.1.0 | 🟡 En curso |
+| Instalación en otros equipos | ⏳ Fase posterior |
 
 - Ver: [Estado actual](docs/00%20-%20Inicio/Estado%20Actual.md)
 
-> La interfaz web es una sola página (vistas por hash) conectada a la API v0.1: muestra estados reales y permite iniciar/detener/reiniciar y ver logs. El registro manual de servicios llega en una próxima iteración.
+> **Orientación:** ProjectLumina gestiona la máquina donde corre (local). El acceso remoto desde otros dispositivos queda para una fase posterior. La interfaz es una sola página (vistas por hash) conectada a la API v0.1: métricas, estados reales, iniciar/detener/reiniciar, logs y registro de servicios.
 
 ---
 

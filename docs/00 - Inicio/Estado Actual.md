@@ -6,9 +6,11 @@
 
 ## Fase actual
 
-**Desarrollo de la v0.1.0 en curso (local).** 🟡
+**Desarrollo de la v0.1.0 en curso.** 🟡
 
-La planificación está completa (requisitos técnicos y arquitectura definitiva cerrados) y se está construyendo la v0.1 **localmente, sin esperar al servidor**: estructura `app/` en capas (api → services → system → models → config → db), API REST con token, SQLite + SQLModel, tests con pytest y dashboard conectado a datos reales. El despliegue en el servidor ([Dell Inspiron de 2010](../02%20-%20Desarrollo/Servidor.md), pendiente de renovación) llegará en una fase posterior.
+**Cambio de orientación:** ProjectLumina pasa de "centro de control remoto de un servidor ajeno" a un **panel que gestiona la máquina donde corre** — sistema operativo, servicios systemd, procesos, bots y webs. Todo es funcional ya en el equipo de desarrollo: estructura `app/` en capas (api → services → system → models → config → db), API REST con token, SQLite + SQLModel, tests con pytest, dashboard conectado a datos reales y **registro de servicios desde la interfaz** (formulario → `POST /api/servicios`).
+
+La **administración remota** (acceso desde otro dispositivo, p. ej. el iPhone) queda como **fase posterior**, una vez el producto funcione de forma local.
 
 ---
 
@@ -27,11 +29,13 @@ ARQUITECTURA DEFINITIVA DEL MVP ✅
      ↓
 ESTRUCTURA DEL REPOSITORIO ✅ (decidida)
      ↓
-DESARROLLO v0.1.0  🟡 en curso (local)
+DESARROLLO v0.1.0  🟡 en curso
      ↓
 TESTING ✅ (pytest backend)
      ↓
-DEPLOY (espera servidor)
+REGISTRO DE SERVICIOS ✅ (desde la interfaz)
+     ↓
+INSTALACIÓN EN OTROS EQUIPOS (fase posterior)
 ```
 
 ---

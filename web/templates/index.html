@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lumina · Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
@@ -51,27 +51,62 @@
       <header class="topbar">
         <div>
           <h1>resumen</h1>
-          <p class="topbar-sub">sin servicios registrados</p>
+          <p class="topbar-sub" id="resumenSub">conectando al servidor…</p>
         </div>
         <button class="btn btn-primary" id="refreshBtn">
           <span class="btn-icon">⟳</span> actualizar estado
         </button>
       </header>
 
-      <!-- Services -->
+      <!-- Métricas rápidas -->
       <section class="section">
+        <div class="metrics" id="metricsGrid">
+
+          <article class="metric-card" id="metricCpuCard">
+            <div class="metric-label">cpu</div>
+            <div class="metric-value" id="metricCpu">—</div>
+            <div class="metric-bar" id="metricCpuBarWrap"><span id="metricCpuBar" style="width:0%"></span></div>
+            <div class="metric-sub" id="metricCpuSub">promedio de uso</div>
+          </article>
+
+          <article class="metric-card" id="metricRamCard">
+            <div class="metric-label">memoria</div>
+            <div class="metric-value" id="metricRam">—</div>
+            <div class="metric-bar" id="metricRamBarWrap"><span id="metricRamBar" style="width:0%"></span></div>
+            <div class="metric-sub" id="metricRamSub">memoria del sistema</div>
+          </article>
+
+          <article class="metric-card" id="metricSvcCard">
+            <div class="metric-label">servicios</div>
+            <div class="metric-value" id="metricSvc">—</div>
+            <div class="metric-bar" id="metricSvcBarWrap"><span id="metricSvcBar" style="width:0%"></span></div>
+            <div class="metric-sub" id="metricSvcSub">en línea</div>
+          </article>
+
+          <article class="metric-card" id="metricUptimeCard">
+            <div class="metric-label">uptime</div>
+            <div class="metric-value" id="metricUptime">—</div>
+            <div class="metric-sub" id="metricUptimeSub">desde el arranque</div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Services -->
+      <!-- Services (resumen) -->
+      <section class="section" id="resumenServicesSection">
         <div class="section-head">
           <h2>servicios</h2>
           <button class="link-btn" id="addServiceLink">+ añadir servicio</button>
         </div>
 
-        <div class="cards">
+        <div class="cards" id="resumenGrid">
 
           <article class="card card--empty is-visible" id="emptyServiceCard">
             <p class="card-empty-icon">＋</p>
             <p class="card-empty-title">conectar un servicio</p>
-            <p class="card-empty-sub">cuando el servidor esté conectado podrás registrar bots, webs y procesos systemd para administrarlos desde aquí</p>
-            <span class="chip">disponible en v0.1</span>
+            <p class="card-empty-sub">registra bots, webs y procesos de este equipo para administrarlos desde aquí: estado, inicio, detención y logs</p>
+            <span class="chip">este equipo</span>
           </article>
 
         </div>
@@ -121,15 +156,15 @@
           <article class="card card--empty is-visible" id="emptyBots" data-type-panel="bot">
             <p class="card-empty-icon">🤖</p>
             <p class="card-empty-title">ningún bot registrado</p>
-            <p class="card-empty-sub">cuando el servidor esté conectado podrás registrar aquí tus bots (discord, telegram, procesos de python…) para iniciarlos, detenerlos y ver sus logs</p>
-            <span class="chip">disponible en v0.1</span>
+            <p class="card-empty-sub">registra aquí tus bots (discord, telegram, procesos de python…) para iniciarlos, detenerlos y ver sus logs en este equipo</p>
+            <span class="chip">este equipo</span>
           </article>
 
           <article class="card card--empty" id="emptyWebs" data-type-panel="web">
             <p class="card-empty-icon">🌐</p>
             <p class="card-empty-title">ninguna web registrada</p>
-            <p class="card-empty-sub">cuando el servidor esté conectado podrás registrar aquí tus sitios y apps (fastapi, nginx, static…) para administrarlos desde este panel</p>
-            <span class="chip">disponible en v0.1</span>
+            <p class="card-empty-sub">registra aquí tus sitios y apps (fastapi, nginx, static…) para administrarlas desde este panel</p>
+            <span class="chip">este equipo</span>
           </article>
 
         </div>
@@ -137,14 +172,32 @@
 
     </section>
 
-    <!-- Vista: registro (próximamente) -->
+    <!-- Vista: registro (logs de systemd en un terminal) -->
     <section class="view" data-view="registro">
       <header class="topbar">
         <div>
           <h1>registro</h1>
-          <p class="topbar-sub">próximamente en v0.1</p>
+          <p class="topbar-sub">logs en vivo de systemd · fastapi · bots</p>
         </div>
       </header>
+
+      <section class="section">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="terminal-title" id="termTitle">lumina · selector de servicio</span>
+            <div class="terminal-actions">
+              <select class="term-select" id="termSelect" aria-label="Servicio">
+                <option value="">elige un servicio…</option>
+              </select>
+              <button class="btn btn-ghost term-btn" id="termRefresh" disabled>&#x21bb; recargar</button>
+              <button class="btn btn-ghost term-btn" id="termLive" disabled>live</button>
+            </div>
+          </div>
+          <pre class="terminal-body" id="termBody"><code>// elige un servicio del panel para ver sus logs de systemd.
+// requiere que el servicio tenga una unidad systemd configurada.</code></pre>
+        </div>
+      </section>
     </section>
 
     <!-- Vista: ajustes (próximamente) -->
@@ -158,6 +211,80 @@
     </section>
 
   </main>
+</div>
+
+<!-- ============ MODAL: conectar un servicio ============ -->
+<div class="modal" id="serviceModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="serviceModalTitle">
+    <header class="modal-head">
+      <div>
+        <h2 id="serviceModalTitle">conectar un servicio</h2>
+        <p class="modal-sub">registra un bot o una web gestionados desde este equipo</p>
+      </div>
+      <button class="modal-x" id="modalClose" aria-label="cerrar">×</button>
+    </header>
+
+    <form id="serviceForm" novalidate>
+
+      <div class="modal-tabs" role="tablist" aria-label="Tipo de servicio">
+        <button type="button" class="modal-tab is-active" data-modal-tipo="bot" role="tab" aria-selected="true">
+          <span>🤖</span> bot
+        </button>
+        <button type="button" class="modal-tab" data-modal-tipo="web" role="tab" aria-selected="false">
+          <span>🌐</span> web
+        </button>
+      </div>
+
+      <label class="field">
+        <span class="field-label">nombre <em>*</em></span>
+        <input class="field-input" id="f_nombre" name="nombre" required placeholder="ej. mi-bot de discord" autocomplete="off" maxlength="80">
+      </label>
+
+      <label class="field">
+        <span class="field-label">unidad systemd</span>
+        <input class="field-input" id="f_servicio" name="servicio" placeholder="ej. mi-bot.service" autocomplete="off" maxlength="120">
+        <span class="field-hint">si usas systemd, el estado reflejará la unidad (iniciar, detener, reiniciar y logs).</span>
+      </label>
+
+      <div class="field-grid">
+        <label class="field">
+          <span class="field-label">comando</span>
+          <input class="field-input" id="f_comando" name="comando" placeholder="ej. python3 bot.py" autocomplete="off" maxlength="200">
+        </label>
+        <label class="field">
+          <span class="field-label">ruta</span>
+          <input class="field-input" id="f_ruta" name="ruta" placeholder="directorio de trabajo" autocomplete="off" maxlength="200">
+        </label>
+      </div>
+
+      <label class="field is-hidden" id="f_checkUrlField">
+        <span class="field-label">check de estado (web)</span>
+        <input class="field-input" id="f_check_url" name="check_url" placeholder="https://… responde por HTTP" autocomplete="off" maxlength="300">
+        <span class="field-hint">vacío: la web se marcará en línea sin verificación.</span>
+      </label>
+
+      <div class="field-checks">
+        <label class="check">
+          <input type="checkbox" id="f_auto_inicio" name="auto_inicio">
+          <span>auto-inicio</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="f_auto_reinicio" name="auto_reinicio">
+          <span>auto-reinicio</span>
+        </label>
+      </div>
+
+      <p class="modal-error is-hidden" id="modalError"></p>
+
+      <footer class="modal-foot">
+        <button type="button" class="btn" id="modalCancel">cancelar</button>
+        <button type="submit" class="btn btn-primary" id="modalSubmit">
+          <span class="btn-icon">+</span> conectar
+        </button>
+      </footer>
+
+    </form>
+  </div>
 </div>
 
 <script src="static/js/script.js"></script>
