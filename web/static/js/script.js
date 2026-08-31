@@ -1,8 +1,10 @@
 /* ==========================================================
-   ProjectLumina — dashboard base
-   Interacciones de la maqueta: reloj, navegación (hash),
-   vistas, pestañas bots/webs y registro de actividad.
-   Sin backend todavía: todo corre en memoria.
+   ProjectLumina — dashboard v0.1
+   Reloj, navegación (hash), vistas, pestañas bots/webs y
+   registro de actividad. Desde v0.1 consume la API REST:
+     GET  /api/servicios                  listar con estado
+     POST /api/servicios/{id}/{accion}    iniciar/detener/reiniciar
+     GET  /api/servicios/{id}/logs        ver logs
    Solo se registra actividad real (no se inventan datos).
    ========================================================== */
 
@@ -13,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRefreshButton();
   initEmptyCard();
   initServiceTabs();
+  loadServicios();
 });
 
 /* ---------- reloj del servidor ---------- */
@@ -61,68 +64,197 @@ function initNav(){
   applyHash();
 }
 
-/* ---------- acciones sobre servicios (reiniciar / detener / logs) ---------- */
-function initServiceActions(){
-  document.querySelectorAll('.card[data-status]').forEach(card => {
-    card.querySelectorAll('[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const action = btn.dataset.action;
-        const name = card.querySelector('h3')?.textContent?.trim() || 'servicio';
+/* ==========================================================
+   API
+   ========================================================== */
 
-        if (action === 'restart') {
-          restartService(card, name);
-        } else if (action === 'stop') {
-          toggleServiceStatus(card, name);
-        } else if (action === 'logs') {
-          logEvent(`Consultando logs de <strong>${name}</strong>…`, 'ok');
-        }
-      });
-    });
+const estado = {
+  servicios: [],               // lista cruda de /api/servicios
+  token: localStorage.getItem('lumina_token') || '',
+  async cargar(){
+    estado.servicios = await api('/api/servicios');
+  },
+  porTipo(tipo){
+    return estado.servicios.filter(s => s.tipo === tipo);
+  },
+  enLinea(tipo){
+    return estado.porTipo(tipo).filter(s => s.estado === 'online').length;
+  }
+};
+
+async function api(path, opciones = {}){
+  const headers = { ...(opciones.headers || {}) };
+  if (estado.token) headers['X-API-Key'] = estado.token;
+
+  const res = await fetch(path, { ...opciones, headers });
+  if (!res.ok) {
+    let detalle = `HTTP ${res.status}`;
+    try { detalle = (await res.json()).detail || detalle; } catch {}
+    throw new Error(detalle);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+/* ---------- carga y render del listado ---------- */
+async function loadServicios(){
+  try {
+    await estado.cargar();
+  } catch (error) {
+    sinAPI(error.message);
+    return;
+  }
+  renderServicios();
+}
+
+function renderServicios(){
+  renderCuerpo();
+  renderVacios();
+  renderContadores();
+  renderResumen();
+}
+
+function renderCuerpo(){
+  const grid = document.getElementById('servicesGrid');
+  if (!grid) return;
+
+  grid.querySelectorAll('.card[data-id]').forEach(c => c.remove());
+  estado.servicios.forEach(s => grid.appendChild(tarjetaServicio(s)));
+}
+
+function renderVacios(){
+  const total = estado.servicios.length;
+
+  const vacioResumen = document.getElementById('emptyServiceCard');
+  if (vacioResumen) vacioResumen.classList.toggle('is-visible', total === 0);
+
+  ['bot', 'web'].forEach(tipo => {
+    const vacio = document.getElementById(tipo === 'bot' ? 'emptyBots' : 'emptyWebs');
+    if (vacio) vacio.classList.toggle('is-visible', estado.porTipo(tipo).length === 0);
   });
 }
 
-function restartService(card, name){
-  const pill = card.querySelector('.status-pill');
-  const restartBtn = card.querySelector('[data-action="restart"]');
-  if (!pill || !restartBtn) return;
-
-  restartBtn.disabled = true;
-  restartBtn.textContent = 'reiniciando…';
-  pill.classList.remove('status-pill--online');
-  pill.classList.add('status-pill--offline');
-  pill.innerHTML = '<span class="pulse"></span> reiniciando';
-
-  setTimeout(() => {
-    pill.classList.remove('status-pill--offline');
-    pill.classList.add('status-pill--online');
-    pill.innerHTML = '<span class="pulse"></span> activo';
-    restartBtn.disabled = false;
-    restartBtn.textContent = 'reiniciar';
-    logEvent(`<strong>${name}</strong> se reinició correctamente`, 'ok');
-  }, 1400);
+function renderContadores(){
+  const count = document.getElementById('tabCount');
+  if (!count) return;
+  const tipo = document.querySelector('.tab.is-active')?.dataset.type || 'bot';
+  const enLinea = estado.enLinea(tipo);
+  const total = estado.porTipo(tipo).length;
+  count.textContent = `${total} ${tipo === 'bot' ? 'bots' : 'webs'} · ${enLinea} en línea`;
 }
 
-function toggleServiceStatus(card, name){
-  const pill = card.querySelector('.status-pill');
-  const stopBtn = card.querySelector('[data-action="stop"]');
-  if (!pill || !stopBtn) return;
+function renderResumen(){
+  const total = estado.servicios.length;
+  const enLinea = estado.servicios.filter(s => s.estado === 'online').length;
 
-  const isOnline = card.dataset.status === 'online';
+  const sub = document.querySelector('.view[data-view="resumen"] .topbar-sub');
+  if (sub) sub.textContent = total === 0
+    ? 'sin servicios registrados'
+    : `${total} ${total === 1 ? 'servicio' : 'servicios'} · ${enLinea} en línea`;
 
-  if (isOnline) {
-    card.dataset.status = 'offline';
-    pill.classList.remove('status-pill--online');
-    pill.classList.add('status-pill--offline');
-    pill.innerHTML = '<span class="pulse"></span> detenido';
-    stopBtn.textContent = 'iniciar';
-    logEvent(`<strong>${name}</strong> se detuvo manualmente`, 'warn');
-  } else {
-    card.dataset.status = 'online';
-    pill.classList.remove('status-pill--offline');
-    pill.classList.add('status-pill--online');
-    pill.innerHTML = '<span class="pulse"></span> activo';
-    stopBtn.textContent = 'detener';
-    logEvent(`<strong>${name}</strong> se inició manualmente`, 'ok');
+  const subServicios = document.querySelector('.view[data-view="servicios"] .topbar-sub');
+  if (subServicios) subServicios.textContent = total === 0
+    ? 'aún no hay servicios conectados'
+    : `${total} ${total === 1 ? 'servicio conectado' : 'servicios conectados'}`;
+}
+
+function sinAPI(mensaje){
+  // Sin backend no inventamos datos: se quedan los estados vacíos.
+  logEvent(`No se pudo contactar la API (${mensaje}). Cuando el backend esté disponible los estados se actualizarán solos.`, 'warn');
+}
+
+/* ---------- tarjeta de un servicio real ---------- */
+function tarjetaServicio(s){
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.dataset.id = s.id;
+  card.dataset.tipo = s.tipo;
+  card.dataset.status = s.estado;
+
+  const icono = s.tipo === 'bot' ? '🤖' : '🌐';
+  const enLinea = s.estado === 'online';
+  const detalle = s.servicio || s.ruta || s.comando || 'sin unidad systemd';
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">
+        <span class="card-icon">${icono}</span>
+        <div>
+          <h3>${escapar(s.nombre)}</h3>
+          <p class="card-sub">${escapar(detalle)}</p>
+        </div>
+      </div>
+      <span class="status-pill status-pill--${enLinea ? 'online' : 'offline'}">
+        <span class="pulse"></span> ${enLinea ? 'en línea' : s.estado || 'sin estado'}
+      </span>
+    </div>
+    <dl class="card-stats">
+      <div><dt>tipo</dt><dd>${s.tipo}</dd></div>
+      <div><dt>comando</dt><dd>${escapar(s.comando || '—')}</dd></div>
+      <div><dt>auto-inicio</dt><dd>${s.auto_inicio ? 'sí' : 'no'}</dd></div>
+    </dl>
+    <div class="card-actions">
+      <button class="btn-ghost" data-op="iniciar">iniciar</button>
+      <button class="btn-ghost" data-op="detener">detener</button>
+      <button class="btn-ghost" data-op="reiniciar">reiniciar</button>
+      <button class="btn-ghost" data-op="logs">logs</button>
+    </div>
+  `;
+  return card;
+}
+
+function escaper(valor){
+  return String(valor).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+/* ---------- acciones sobre servicios (llaman a la API) ---------- */
+function initServiceActions(){
+  const grid = document.getElementById('servicesGrid');
+  if (!grid) return;
+
+  // delegación de eventos: las tarjetas se re-renderizan con cada carga.
+  grid.addEventListener('click', async (event) => {
+    const btn = event.target.closest('[data-op]');
+    if (!btn) return;
+    const card = btn.closest('.card[data-id]');
+    if (!card) return;
+
+    const id = card.dataset.id;
+    const op = btn.dataset.op;
+    const nombre = card.querySelector('h3')?.textContent?.trim() || 'servicio';
+
+    if (op === 'logs') {
+      await verLogs(id, nombre);
+      return;
+    }
+
+    // iniciar / detener / reiniciar
+    try {
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = op === 'reiniciar' ? 'reiniciando…' : 'enviando…';
+
+      const servicio = await api(`/api/servicios/${id}/${op}`, { method: 'POST' });
+      logEvent(`<strong>${escapar(nombre)}</strong> ${op === 'iniciar' ? 'se inició' : op === 'detener' ? 'se detuvo' : 'se reinició'} · ahora: <strong>${servicio.estado}</strong>`, 'ok');
+
+      renderServicios();
+    } catch (error) {
+      logEvent(`error al ${op} <strong>${escapar(nombre)}</strong>: ${escapar(error.message)}`, 'warn');
+      renderServicios();
+    }
+  });
+}
+
+async function verLogs(id, nombre){
+  try {
+    const datos = await api(`/api/servicios/${id}/logs?lines=100`);
+    const contenido = (datos.log || '').trim() || 'log vacío';
+    logEvent(`logs de <strong>${escapar(nombre)}</strong> (${datos.lines} líneas)`, 'ok');
+    logEvent(`<span class="log-pre">${escapar(contenido.slice(-600))}</span>`, 'ok');
+  } catch (error) {
+    logEvent(`error al leer logs de <strong>${escapar(nombre)}</strong>: ${escapar(error.message)}`, 'warn');
   }
 }
 
@@ -131,29 +263,32 @@ function initRefreshButton(){
   const btn = document.getElementById('refreshBtn');
   if (!btn) return;
 
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
     btn.classList.add('is-loading');
     btn.disabled = true;
 
-    setTimeout(() => {
-      btn.classList.remove('is-loading');
-      btn.disabled = false;
-      logEvent('Sin servicios registrados: no hay nada que comprobar todavía', 'warn');
-    }, 700);
+    await loadServicios();
+
+    btn.classList.remove('is-loading');
+    btn.disabled = false;
+    const total = estado.servicios.length;
+    logEvent(total === 0
+      ? 'Sin servicios registrados: no hay nada que comprobar todavía'
+      : `Estado actualizado: ${total} ${total === 1 ? 'servicio' : 'servicios'} · ${estado.servicios.filter(s => s.estado === 'online').length} en línea`, 'ok');
   });
 }
 
-/* ---------- tarjeta vacía: invita a conectar un servicio ---------- */
+/* ---------- tarjeta vacía: futuro conectar un servicio ---------- */
 function initEmptyCard(){
-  document.querySelectorAll('#emptyServiceCard, .card--empty').forEach(card => {
-    card.addEventListener('click', () => {
-      logEvent('Conectar un servicio estará disponible en la versión v0.1', 'warn');
+  [document.getElementById('emptyServiceCard'), document.querySelector('.card--empty')].forEach(card => {
+    if (card) card.addEventListener('click', () => {
+      logEvent('La interfaz para añadir servicios llegará en una próxima iteración de v0.1', 'warn');
     });
   });
 
   document.querySelectorAll('#addServiceLink, #addServiceBtn').forEach(btn => {
     btn.addEventListener('click', () => {
-      logEvent('Conectar un servicio estará disponible en la versión v0.1', 'warn');
+      logEvent('La interfaz para añadir servicios llegará en una próxima iteración de v0.1', 'warn');
     });
   });
 }
@@ -161,11 +296,7 @@ function initEmptyCard(){
 /* ---------- panel de servicios: selector bots / webs ---------- */
 function initServiceTabs(){
   const tabs = document.querySelectorAll('.tab[data-type]');
-  const count = document.getElementById('tabCount');
   if (!tabs.length) return;
-
-  // conteo real de servicios registrados por tipo (0 mientras no haya backend)
-  const totals = { bot: 0, web: 0 };
 
   const setActiveTab = (type) => {
     tabs.forEach(tab => {
@@ -178,10 +309,7 @@ function initServiceTabs(){
       panel.classList.toggle('is-visible', panel.dataset.typePanel === type);
     });
 
-    if (count) {
-      const label = type === 'bot' ? 'bots' : 'webs';
-      count.textContent = `${totals[type]} ${label}`;
-    }
+    renderContadores();
   };
 
   tabs.forEach(tab => {

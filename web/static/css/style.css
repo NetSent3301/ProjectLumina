@@ -449,6 +449,29 @@ a:focus-visible, button:focus-visible{
 .log-dot--danger{ background: var(--danger); }
 .log-text{ color: var(--text-dim); }
 .log-text strong{ color: var(--text); font-weight: 600; }
+.log-pre{
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  background: var(--navy-800);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 8px 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 100%;
+  margin-top: 4px;
+}
+
+/* botones durante una operación en curso */
+.btn:disabled, .btn-ghost:disabled{
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+  pointer-events: none;
+}
 
 /* ==========================================================
    Micro-animaciones

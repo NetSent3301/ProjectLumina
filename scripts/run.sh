@@ -15,5 +15,7 @@ echo "Instalando dependencias..."
 pip install --quiet -r requirements.txt
 
 # 3) Arrancar el servidor
-echo "Arrancando ProjectLumina en http://127.0.0.1:8000"
-uvicorn lumina:app --reload
+HOST="${LUMINA_HOST:-127.0.0.1}"
+PORT="${LUMINA_PORT:-8000}"
+echo "Arrancando ProjectLumina en http://$HOST:$PORT"
+uvicorn app.main:app --host "$HOST" --port "$PORT" --reload

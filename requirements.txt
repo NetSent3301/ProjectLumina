@@ -2,3 +2,6 @@ fastapi
 uvicorn[standard]
 pytest
 httpx
+psutil
+sqlmodel
+pydantic-settings

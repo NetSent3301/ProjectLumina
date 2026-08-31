@@ -5,8 +5,11 @@ vendor/
 # Entornos virtuales de Python
 venv/
 .venv/
+
+# Caches
 __pycache__/
 *.py[cod]
+.pytest_cache/
 
 # Archivos de entorno y secretos
 .env
