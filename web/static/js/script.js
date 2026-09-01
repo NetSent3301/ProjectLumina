@@ -5,6 +5,7 @@
      GET  /api/servicios                  listar con estado
      POST /api/servicios/{id}/{accion}    iniciar/detener/reiniciar
      GET  /api/servicios/{id}/logs        ver logs
+     GET  /api/update                     chequeo de actualizaciones
    Solo se registra actividad real (no se inventan datos).
    ========================================================== */
 
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initServiceTabs();
   initTerminal();
   initServidores();
+  initUpdateNotifications();
   loadServicios();
   loadMetricas();
   cargarConexion();
@@ -1078,4 +1080,131 @@ function formatearHora(iso){
   if (!iso) return '—';
   const fecha = new Date(iso);
   return isNaN(fecha) ? '—' : fecha.toLocaleTimeString('es-CO', { hour12: false });
+}
+
+/* ==========================================================
+   Notificaciones de Actualización (GitHub Releases)
+   ========================================================== */
+
+let updateTimer = null;
+let updateDismissed = false;
+
+async function initUpdateNotifications(){
+  // Verificar si el usuario ya dismissó la notificación actual
+  const dismissed = localStorage.getItem('lumina_update_dismissed');
+  if (dismissed){
+    try {
+      const data = JSON.parse(dismissed);
+      if (data.version && data.hasta && new Date(data.hasta) > new Date()){
+        updateDismissed = true;
+        return;
+      }
+    } catch {}
+  }
+
+  // Chequeo inicial
+  await chequearActualizacion();
+
+  // Programar chequeos periódicos (cada 30 min en frontend como respaldo)
+  if (!updateTimer){
+    updateTimer = setInterval(async () => {
+      if (!updateDismissed) await chequearActualizacion();
+    }, 30 * 60 * 1000); // 30 min
+  }
+}
+
+async function chequearActualizacion(forzar = false){
+  try {
+    const res = await fetch('/api/update' + (forzar ? '?forzar=true' : ''));
+    if (!res.ok) return;
+    const data = await res.json();
+
+    if (data.hay_actualizacion && !updateDismissed){
+      mostrarNotificacionActualizacion(data);
+    }
+  } catch (e) {
+    // Silencioso: no molestar si falla el chequeo
+    console.debug('Update check failed:', e);
+  }
+}
+
+function mostrarNotificacionActualizacion(data){
+  // Crear contenedor de notificaciones si no existe
+  let container = document.getElementById('updateNotifications');
+  if (!container){
+    container = document.createElement('div');
+    container.id = 'updateNotifications';
+    container.className = 'update-notifications';
+    document.body.appendChild(container);
+  }
+
+  // Evitar duplicados
+  if (container.querySelector(`[data-version="${data.version_nueva}"]`)) return;
+
+  const notif = document.createElement('div');
+  notif.className = 'update-notification update-notification--new';
+  notif.dataset.version = data.version_nueva;
+  notif.innerHTML = `
+    <div class="update-notification__icon">🔔</div>
+    <div class="update-notification__content">
+      <h4>Nueva versión disponible: v${data.version_nueva}</h4>
+      <p>Estás en v${data.version_actual}. <a href="${data.release_url}" target="_blank" rel="noopener">Ver cambios en GitHub</a></p>
+      ${data.release_notes ? `<details class="update-notification__changelog"><summary>Notas de la versión</summary><div>${escapeHtml(data.release_notes.slice(0, 500))}${data.release_notes.length > 500 ? '…' : ''}</div></details>` : ''}
+    </div>
+    <div class="update-notification__actions">
+      <button class="btn-ghost" data-action="dismiss" title="No volver a avisar 24h">✕</button>
+      <button class="btn-primary" data-action="refresh">Actualizar ahora</button>
+    </div>
+  `;
+
+  // Eventos
+  notif.querySelector('[data-action="dismiss"]').addEventListener('click', () => {
+    dismissUpdateNotification(data.version_nueva, 24);
+    notif.remove();
+  });
+  notif.querySelector('[data-action="refresh"]').addEventListener('click', async () => {
+    notif.querySelector('[data-action="refresh"]').disabled = true;
+    notif.querySelector('[data-action="refresh"]').textContent = 'Comprobando…';
+    await chequearActualizacion(true);
+    notif.remove();
+  });
+
+  container.appendChild(notif);
+
+  // Auto-remove after 30 seconds if not interacted
+  setTimeout(() => {
+    if (notif.parentNode) notif.classList.add('update-notification--fade');
+    setTimeout(() => notif.remove(), 500);
+  }, 30000);
+}
+
+async function dismissUpdateNotification(version, horas){
+  updateDismissed = true;
+  const hasta = new Date(Date.now() + horas * 3600 * 1000).toISOString();
+  localStorage.setItem('lumina_update_dismissed', JSON.stringify({ version, hasta }));
+
+  // Notificar al backend (requiere token)
+  const token = localStorage.getItem('lumina_token');
+  if (token){
+    try {
+      await fetch('/api/update/dismiss', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': token },
+        body: JSON.stringify({ version, horas })
+      });
+    } catch {}
+  }
+
+  // Re-activar chequeos después del tiempo de dismiss
+  setTimeout(() => {
+    updateDismissed = false;
+    localStorage.removeItem('lumina_update_dismissed');
+    chequearActualizacion();
+  }, horas * 3600 * 1000);
+}
+
+function escapeHtml(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }

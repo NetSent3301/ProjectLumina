@@ -43,3 +43,4 @@
   - [Docker](Despliegue/Docker.md) — Imagen slim y Alpine, panel y agente multi-init.
   - [Alpine Linux](Despliegue%20Alpine.md) — Guía completa OpenRC/Alpine.
   - [Instalación Paso a Paso](Instalacion%20Paso%20a%20Paso.md) — Guía práctica panel + agentes.
+  - [Sistema de Actualizaciones](Sistema%20de%20Actualizaciones.md) — Notificaciones push GitHub Releases.

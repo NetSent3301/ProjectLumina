@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Actualizaciones (GitHub).
-    github_repo: str = "usuario/repo"          # ej: "netsent/ProjectLumina"
+    github_repo: str = "NetSent3301/ProjectLumina"
     github_token: str = ""                     # opcional: GitHub Personal Access Token (para rate limit alto)
     update_check_interval_hours: int = 6       # cada cuántas horas comprobar
     update_notify_enabled: bool = True         # activar/desactivar notificaciones

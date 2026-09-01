@@ -36,7 +36,7 @@ Este `docs/` es la **única fuente de documentación**: funciona como *vault* de
 - Sistema: [Servidor](02%20-%20Desarrollo/Servidor.md) · [Control Remoto](02%20-%20Desarrollo/Control%20Remoto.md) · [Sistema Adaptable](02%20-%20Desarrollo/Sistema%20Adaptable.md) · [Notificaciones](02%20-%20Desarrollo/Notificaciones.md) · [Git y GitHub](02%20-%20Desarrollo/Git%20y%20GitHub.md).
 
 ### 🚀 Despliegue
-- [Docker](02%20-%20Desarrollo/Despliegue/Docker.md) · [Alpine Linux](02%20-%20Desarrollo/Despliegue%20Alpine.md) · [Instalación Paso a Paso](02%20-%20Desarrollo/Instalacion%20Paso%20a%20Paso.md).
+- [Docker](02%20-%20Desarrollo/Despliegue/Docker.md) · [Alpine Linux](02%20-%20Desarrollo/Despliegue%20Alpine.md) · [Instalación Paso a Paso](02%20-%20Desarrollo/Instalacion%20Paso%20a%20Paso.md) · [Sistema de Actualizaciones](02%20-%20Desarrollo/Sistema%20de%20Actualizaciones.md).
 
 ### 🔐 Seguridad
 - [Seguridad](03%20-%20Seguridad/Seguridad.md) · [Acceso Remoto](03%20-%20Seguridad/Acceso%20Remoto.md) · [Autenticacion](03%20-%20Seguridad/Autenticacion.md) · [Permisos](03%20-%20Seguridad/Permisos.md) · [Usuarios](03%20-%20Seguridad/Usuarios.md).

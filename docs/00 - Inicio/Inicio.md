@@ -18,7 +18,7 @@
 | 📚 Investigación | [Debian](../04%20-%20Investigacion/Debian.md) · [Linux](../04%20-%20Investigacion/Linux.md) · [Redes](../04%20-%20Investigacion/Redes.md) · [SSH](../04%20-%20Investigacion/SSH.md) · [systemd](../04%20-%20Investigacion/systemd.md) |
 | 🚀 Versiones | [v0.1](../05%20-%20Versiones/v0.1.md) · [v0.2](../05%20-%20Versiones/v0.2.md) · [v0.3](../05%20-%20Versiones/v0.3.md) |
 | 📒 Registro | [Changelog](../06%20-%20Registro/Changelog.md) · [Errores](../06%20-%20Registro/Errores.md) · [Decisiones](../06%20-%20Registro/Decisiones.md) · [Implementacion](../06%20-%20Registro/Implementacion.md) |
-| 🐳 Despliegue | [Docker](../02%20-%20Desarrollo/Despliegue/Docker.md) · [Alpine Linux](../02%20-%20Desarrollo/Despliegue%20Alpine.md) · [Instalación Paso a Paso](../02%20-%20Desarrollo/Instalacion%20Paso%20a%20Paso.md) |
+| 🐳 Despliegue | [Docker](../02%20-%20Desarrollo/Despliegue/Docker.md) · [Alpine Linux](../02%20-%20Desarrollo/Despliegue%20Alpine.md) · [Instalación Paso a Paso](../02%20-%20Desarrollo/Instalacion%20Paso%20a%20Paso.md) · [Sistema de Actualizaciones](../02%20-%20Desarrollo/Sistema%20de%20Actualizaciones.md) |
 
 ---
 
@@ -57,6 +57,7 @@
 - [Docker](../02%20-%20Desarrollo/Despliegue/Docker.md) — Imagen slim y Alpine, panel y agente multi-init.
 - [Alpine Linux](../02%20-%20Desarrollo/Despliegue%20Alpine.md) — Guía completa OpenRC/Alpine.
 - [Instalación Paso a Paso](../02%20-%20Desarrollo/Instalacion%20Paso%20a%20Paso.md) — Guía práctica panel + agentes.
+- [Sistema de Actualizaciones](../02%20-%20Desarrollo/Sistema%20de%20Actualizaciones.md) — Notificaciones push GitHub Releases.
 
 ### 03 - Seguridad
 - [Acceso Remoto](../03%20-%20Seguridad/Acceso%20Remoto.md) — Exposición a Internet y medidas.

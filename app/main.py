@@ -7,28 +7,39 @@ arquitectura definitiva del MVP).
 Rutas:
 - Frontend:  /               (una sola página, vistas por hash)
 - Estáticos: /static
-- API:       /api/health (sin token), /api/servicios*, /api/servidor*
+- API:       /api/health (sin token), /api/servicios*, /api/servidor*, /api/update*
 """
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api import servidor, servidores, servicios
+from .api import servidor, servidores, servicios, update
 from .api.auth import require_token
 from .config import get_settings
 from .db import init_db
+from .services.update_background import iniciar_background_updates, detener_background_updates
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB_DIR = ROOT / "web"
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    iniciar_background_updates()
+    yield
+    # Shutdown
+    detener_background_updates()
+
+
 def create_app() -> FastAPI:
     init_db()
 
-    app = FastAPI(title="ProjectLumina", version="0.1.0")
+    app = FastAPI(title="ProjectLumina", version="0.1.1", lifespan=lifespan)
 
     app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
 
@@ -49,7 +60,7 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     def health():
         """Estado del backend (no requiere token)."""
-        return JSONResponse({"status": "ok", "version": "0.1.0"})
+        return JSONResponse({"status": "ok", "version": "0.1.1"})
 
     # El resto de la API requiere token cuando LUMINA_TOKEN está configurado.
     app.include_router(
@@ -70,6 +81,8 @@ def create_app() -> FastAPI:
         tags=["servidores"],
         dependencies=[Depends(require_token)],
     )
+    # Update endpoints: /api/update (GET sin token, POST con token)
+    app.include_router(update.router)
 
     return app
 
