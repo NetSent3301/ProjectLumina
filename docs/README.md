@@ -30,10 +30,13 @@ Este `docs/` es la **única fuente de documentación**: funciona como *vault* de
 - [Requisitos](01%20-%20Planificacion/Requisitos.md) · [Arquitectura](01%20-%20Planificacion/Arquitectura.md) · [Roadmap](01%20-%20Planificacion/Roadmap.md) · [Tareas](01%20-%20Planificacion/Tareas.md) · [Principios técnicos](01%20-%20Planificacion/Principios%20Tecnicos.md).
 
 ### 🛠️ Desarrollo
-- [Backend](02%20-%20Desarrollo/Backend.md) · [Frontend](02%20-%20Desarrollo/Frontend.md) · [API](02%20-%20Desarrollo/API.md) · [Base de datos](02%20-%20Desarrollo/Base%20de%20Datos.md) · [Dashboard](02%20-%20Desarrollo/Dashboard.md) · [UI - Sistema de Diseño](02%20-%20Desarrollo/UI%20-%20Sistema%20de%20Diseno.md) · [Configuración](02%20-%20Desarrollo/Configuracion.md).
+- [Backend](02%20-%20Desarrollo/Backend.md) · [Frontend](02%20-%20Desarrollo/Frontend.md) · [API](02%20-%20Desarrollo/API.md) · [Base de datos](02%20-%20Desarrollo/Base%20de%20Datos.md) · [Dashboard](02%20-%20Desarrollo/Dashboard.md) · [UI - Sistema de Diseño](02%20-%20Desarrollo/UI%20-%20Sistema%20de%20Diseno.md) · [Configuración](02%20-%20Desarrollo/Configuracion.md) · [Arquitectura Backend](02%20-%20Desarrollo/Arquitectura%20Backend.md) · [Init System](02%20-%20Desarrollo/Init%20System.md).
 - Bots: [Bots](02%20-%20Desarrollo/Bots.md) · [Configuración de Bots](02%20-%20Desarrollo/Configuracion%20de%20Bots.md) · [Acciones de Bots](02%20-%20Desarrollo/Acciones%20de%20Bots.md) · [Auto Restart](02%20-%20Desarrollo/Auto%20Restart.md).
 - Webs: [Webs](02%20-%20Desarrollo/Webs.md) · [Gestión avanzada de Webs](02%20-%20Desarrollo/Gestion%20Avanzada%20de%20Webs.md).
 - Sistema: [Servidor](02%20-%20Desarrollo/Servidor.md) · [Control Remoto](02%20-%20Desarrollo/Control%20Remoto.md) · [Sistema Adaptable](02%20-%20Desarrollo/Sistema%20Adaptable.md) · [Notificaciones](02%20-%20Desarrollo/Notificaciones.md) · [Git y GitHub](02%20-%20Desarrollo/Git%20y%20GitHub.md).
+
+### 🚀 Despliegue
+- [Docker](02%20-%20Desarrollo/Despliegue/Docker.md) · [Alpine Linux](02%20-%20Desarrollo/Despliegue%20Alpine.md) · [Instalación Paso a Paso](02%20-%20Desarrollo/Instalacion%20Paso%20a%20Paso.md).
 
 ### 🔐 Seguridad
 - [Seguridad](03%20-%20Seguridad/Seguridad.md) · [Acceso Remoto](03%20-%20Seguridad/Acceso%20Remoto.md) · [Autenticacion](03%20-%20Seguridad/Autenticacion.md) · [Permisos](03%20-%20Seguridad/Permisos.md) · [Usuarios](03%20-%20Seguridad/Usuarios.md).

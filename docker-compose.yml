@@ -1,16 +1,3 @@
-# ProjectLumina — docker-compose para homelab
-#
-# Dos perfiles:
-#   1) Panel central (donde ves la UI y agregas servidores remotos)
-#      docker compose --profile panel up -d
-#
-#   2) Agente en cada máquina del homelab (gestiona systemd local)
-#      docker compose --profile agente up -d
-#
-# Uso típico:
-#   - En tu máquina: panel
-#   - En cada server del homelab: agente
-#   - En el panel (vista "servidores") registras cada agente con su IP:puerto y token
 
 services:
   # ──────────────────────────────────────────────
@@ -44,7 +31,7 @@ services:
       start_period: 10s
 
   # ──────────────────────────────────────────────
-  # Agente: corre en cada server del homelab
+  # Agente (systemd): corre en cada server con systemd
   # Necesita acceso a systemd/journalctl del host
   # ──────────────────────────────────────────────
   agente:
@@ -78,6 +65,40 @@ services:
       retries: 3
       start_period: 10s
 
+  # ──────────────────────────────────────────────
+  # Agente (OpenRC/Alpine): corre en cada server Alpine
+  # NO necesita montajes de systemd — usa rc-service/rc-status del host
+  # ──────────────────────────────────────────────
+  agente-alpine:
+    profiles: ["agente-alpine"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: python:3.12-alpine
+    container_name: luminia-agente-alpine
+    restart: unless-stopped
+    # Para acceder a OpenRC del host:
+    pid: "host"
+    privileged: true
+    # Solo volumen de datos; NO montar /run/systemd (no existe en OpenRC)
+    volumes:
+      - ./data:/app/data
+    environment:
+      - LUMINA_HOST=0.0.0.0
+      - LUMINA_PORT=8127
+      - LUMINA_DB=/app/data/lumina.db
+      - LUMINA_TOKEN=${LUMINA_TOKEN:-}
+      - LUMINA_DEBUG=${LUMINA_DEBUG:-false}
+    networks:
+      - luminia_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8127/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 networks:
   luminia_net:
     driver: bridge
@@ -88,3 +109,18 @@ networks:
 # LUMINA_TOKEN=tu-clave-secreta   # obligatorio si expones a red
 # LUMINA_PORT=8127                # puerto publicado
 # LUMINA_DEBUG=false              # true para logs verbosos
+#
+# ──────────────────────────────────────────────
+# Uso rápido
+# ──────────────────────────────────────────────
+# Panel central (cualquier host):
+#   docker compose --profile panel up -d
+#
+# Agente en host con systemd (Debian, Ubuntu, Arch...):
+#   docker compose --profile agente up -d
+#
+# Agente en host con OpenRC/Alpine (Alpine Linux, Gentoo, Artix-openrc):
+#   docker compose --profile agente-alpine up -d
+#
+# Ver init system detectado en el agente:
+#   curl http://localhost:8127/api/servidor/init

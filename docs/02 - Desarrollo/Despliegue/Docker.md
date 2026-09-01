@@ -191,6 +191,14 @@ docker run -d \
 > [!NOTE]
 > `rc-service` y `rc-status` deben estar instalados **en el host** (no en el
 > contenedor). El contenedor los llama vía el namespace de PID del host.
+>
+> **No se montan** `/run/systemd`, `/var/run/dbus`, `/sys/fs/cgroup` —
+> OpenRC no los usa. Los logs se leen del syslog del host (`/var/log/messages`)
+> o de `/var/log/<servicio>/current` si usa svlogd.
+
+### docker-compose.yml con perfil `agente-alpine`
+
+Ver [docker-compose.yml](../../../docker-compose.yml) — incluye perfil `agente-alpine` sin los volúmenes de systemd.
 
 ### Host con Runit (Void Linux, Artix-runit)
 

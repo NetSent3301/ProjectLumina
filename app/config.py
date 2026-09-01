@@ -31,6 +31,12 @@ class Settings(BaseSettings):
     # Depuración.
     debug: bool = False
 
+    # Actualizaciones (GitHub).
+    github_repo: str = "usuario/repo"          # ej: "netsent/ProjectLumina"
+    github_token: str = ""                     # opcional: GitHub Personal Access Token (para rate limit alto)
+    update_check_interval_hours: int = 6       # cada cuántas horas comprobar
+    update_notify_enabled: bool = True         # activar/desactivar notificaciones
+
 
 def get_settings() -> Settings:
     """Devuelve la configuración actual.

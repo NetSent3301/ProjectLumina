@@ -10,6 +10,8 @@
 - [Base de Datos](Base%20de%20Datos.md) — SQLite → PostgreSQL.
 - [Configuración](Configuracion.md) — Variables de entorno y puesta en marcha.
 - [Dashboard](Dashboard.md) — Centro de control.
+- [Arquitectura Backend](Arquitectura%20Backend.md) — Estructura en capas, patrones y contratos.
+- [Init System](Init%20System.md) — Abstracción multi-init (systemd/OpenRC/Runit/SysV).
 
 ## Gestión de bots
 
@@ -39,3 +41,5 @@
 
 - [Despliegue/Índice](Despliegue/%C3%8Dndice.md) — Guías de puesta en producción.
   - [Docker](Despliegue/Docker.md) — Imagen slim y Alpine, panel y agente multi-init.
+  - [Alpine Linux](Despliegue%20Alpine.md) — Guía completa OpenRC/Alpine.
+  - [Instalación Paso a Paso](Instalacion%20Paso%20a%20Paso.md) — Guía práctica panel + agentes.
