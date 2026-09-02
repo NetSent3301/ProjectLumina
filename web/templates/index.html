@@ -258,14 +258,46 @@
       </section>
     </section>
 
-    <!-- Vista: ajustes (próximamente) -->
+    <!-- Vista: ajustes -->
     <section class="view" data-view="ajustes">
       <header class="topbar">
         <div>
           <h1>ajustes</h1>
-          <p class="topbar-sub">próximamente en v0.1</p>
+          <p class="topbar-sub">configuración del panel</p>
         </div>
       </header>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>autenticación API</h2>
+        </div>
+        <div class="card">
+          <p class="card-empty-sub">Si el backend tiene <code>LUMINA_TOKEN</code> configurado, debes guardar aquí tu token para que el panel funcione.</p>
+          <label class="field" style="margin-top: 1rem;">
+            <span class="field-label">token de API <em>*</em></span>
+            <input class="field-input" id="apiTokenInput" type="password" placeholder="pega tu LUMINA_TOKEN aquí" autocomplete="off" maxlength="200">
+            <span class="field-hint">Se guarda en tu navegador (localStorage). No sale de este equipo.</span>
+          </label>
+          <div class="field-actions" style="margin-top: 0.75rem;">
+            <button class="btn btn-primary" id="saveTokenBtn"><span class="btn-icon">💾</span> guardar token</button>
+            <button class="btn btn-ghost" id="clearTokenBtn"><span class="btn-icon">🗑️</span> borrar token</button>
+          </div>
+          <p id="tokenStatus" class="field-hint" style="margin-top: 0.5rem;"></p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <h2>información</h2>
+        </div>
+        <div class="card">
+          <dl class="card-stats">
+            <div><dt>versión</dt><dd>v0.1.0</dd></div>
+            <div><dt>backend</dt><dd>FastAPI · SQLite · psutil</dd></div>
+            <div><dt>frontend</dt><dd>HTML · CSS · JS vanilla</dd></div>
+          </dl>
+        </div>
+      </section>
     </section>
 
   </main>
