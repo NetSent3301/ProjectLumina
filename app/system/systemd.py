@@ -16,10 +16,12 @@ Compatibilidad:
 
 from __future__ import annotations  # Permite usar nombres de tipos en anotaciones antes de definirlos.
 
+import os
 import shutil      # Para ``shutil.which``: verifica si un binario existe en PATH.
 import subprocess  # Para ejecutar comandos del sistema y capturar su salida.
 
 from .base import InitBackend, InitError  # Contrato abstracto e excepción base.
+from .privilegios import PriviledgeError, ejecutar, es_root
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -260,9 +262,137 @@ class SystemdBackend(InitBackend):
 
         return resultados
 
+    # ── Creación y gestión de unidades (v0.2) ─────────────────────────────────
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Funciones de módulo (API legada — compatibilidad con código antiguo)
+    def soporta_crear_unidades(self) -> bool:
+        """systemd sí permite crear unidades de servicio."""
+        return True
+
+    @property
+    def _dir_unidades(self) -> str:
+        """Directorio donde systemd lee los archivos .service del administrador."""
+        return "/etc/systemd/system"
+
+    def _nombre_archivo(self, nombre: str) -> str:
+        """Normaliza el nombre de la unidad asegurando la extensión ``.service``."""
+        nombre = nombre.strip()
+        if not nombre.endswith(".service"):
+            nombre += ".service"
+        return nombre
+
+    def _escribir_unidad(self, nombre_archivo: str, contenido: str) -> None:
+        """Escribe el archivo de unidad en ``/etc/systemd/system`` con sudo si hace falta.
+
+        Usa ``tee`` para respetar redirección y permisos vía ``sudo``.
+        """
+        ruta = os.path.join(self._dir_unidades, nombre_archivo)
+
+        try:
+            # Escribimos usando un comando que acepte el contenido por stdin.
+            r = ejecutar(
+                ["tee", ruta],
+                stdin_texto=contenido,
+                timeout=15,
+            )
+        except PriviledgeError as error:
+            raise InitError(
+                f"no se pudo escribir la unidad '{nombre_archivo}': {error}",
+                no_existe=False,
+            ) from None
+
+        if r.returncode != 0:
+            raise InitError(
+                f"no se pudo escribir la unidad '{nombre_archivo}': "
+                f"{_texto(r)}"
+            )
+
+    def daemon_reload(self) -> None:
+        """Recarga la configuración de systemd tras crear/editar unidades."""
+        try:
+            r = ejecutar(["systemctl", "daemon-reload"], timeout=30)
+        except PriviledgeError as error:
+            raise InitError(f"daemon-reload falló: {error}") from None
+
+        if r.returncode != 0:
+            raise InitError(f"daemon-reload falló: {_texto(r)}")
+
+    def habilitar(self, nombre: str, activo: bool = True) -> None:
+        """Habilita (``enable``) o deshabilita (``disable``) el arranque al boot."""
+        accion = "enable" if activo else "disable"
+        try:
+            r = ejecutar(["systemctl", accion, nombre], timeout=30)
+        except PriviledgeError as error:
+            raise InitError(f"systemctl {accion} {nombre}: {error}") from None
+
+        if r.returncode != 0:
+            raise InitError(f"systemctl {accion} {nombre}: {_texto(r)}")
+
+    def crear_unidad(
+        self,
+        nombre: str,
+        *,
+        comando: str,
+        ruta: str,
+        usuario: Optional[str] = None,
+        entorno: Optional[dict] = None,
+        auto_inicio: bool = False,
+        auto_reinicio: bool = False,
+        descripcion: str = "",
+    ) -> str:
+        """Genera, instala y (opcionalmente) habilita una unidad systemd.
+
+        El contenido del archivo ``.service`` se construye a partir de los
+        parámetros y se escribe en ``/etc/systemd/system``.  Tras escribirlo
+        se ejecuta ``daemon-reload`` y, si se pide, ``enable``.
+        """
+        nombre_archivo = self._nombre_archivo(nombre)
+        unidad = os.path.basename(nombre_archivo)
+
+        # Usuario del sistema: por defecto el que corre el panel.
+        if usuario is None and not es_root():
+            import getpass
+            usuario = getpass.getuser()
+        usuario_target = usuario or ""
+
+        lineas = ["[Unit]"]
+        lineas.append(f"Description={descripcion or unidad}")
+
+        # Configuración de reinicio automático (Restart= on-failure).
+        restart = "on-failure" if auto_reinicio else "no"
+        restart_sec = "3" if auto_reinicio else ""
+
+        lineas.append("")
+        lineas.append("[Service]")
+        if usuario_target:
+            lineas.append(f"User={usuario_target}")
+        lineas.append(f"WorkingDirectory={ruta}")
+        lineas.append(f"ExecStart={comando}")
+        lineas.append(f"Restart={restart}")
+        if restart_sec:
+            lineas.append(f"RestartSec={restart_sec}")
+
+        # Variables de entorno extra que la unidad debe recibir.
+        entorno = entorno or {}
+        if entorno:
+            for clave, valor in entorno.items():
+                lineas.append(f"Environment={clave}={valor}")
+
+        lineas.append("")
+        lineas.append("[Install]")
+        lineas.append("WantedBy=multi-user.target")
+        contenido = "\n".join(lineas) + "\n"
+
+        # 1) Escribir la unidad.
+        self._escribir_unidad(nombre_archivo, contenido)
+
+        # 2) Recargar para que systemd conozca la nueva unidad.
+        self.daemon_reload()
+
+        # 3) Habilitar arranque al boot si se solicita.
+        if auto_inicio:
+            self.habilitar(unidad, activo=True)
+
+        return unidad
 # ─────────────────────────────────────────────────────────────────────────────
 # El código anterior a la refactorización importaba funciones sueltas de este
 # módulo (p. ej. ``from ..system import systemd; systemd.is_active(...)``).

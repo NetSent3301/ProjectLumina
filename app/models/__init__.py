@@ -1,5 +1,6 @@
 from .servicio import Servicio, ServicioCreate, ServicioUpdate, TipoServicio
 from .servidor import Servidor, ServidorCreate
+from .despliegue import DespliegueGit
 
 __all__ = [
     "Servicio",
@@ -8,4 +9,5 @@ __all__ = [
     "TipoServicio",
     "Servidor",
     "ServidorCreate",
+    "DespliegueGit",
 ]

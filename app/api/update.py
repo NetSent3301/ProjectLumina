@@ -61,6 +61,12 @@ class UpdateState(BaseModel):
     dismiss_hasta: Optional[str] = None  # ISO timestamp hasta cuándo no molestar
 
 
+class DismissRequest(BaseModel):
+    """Cuerpo de la petición para descartar una actualización."""
+    version: str
+    horas: int = 24
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Utilidades de persistencia
 # ─────────────────────────────────────────────────────────────────────────────
@@ -273,10 +279,10 @@ async def get_update_info(request: Request, forzar: bool = False):
 
 
 @router.post("/update/dismiss")
-async def dismiss_update(version: str, horas: int = 24, _: None = Depends(require_token)):
+async def dismiss_update(datos: DismissRequest, _: None = Depends(require_token)):
     """Descarta la notificación de actualización por N horas (requiere token)."""
-    dismiss_actualizacion(version, horas)
-    return {"ok": True, "dismiss_hasta": (datetime.now() + timedelta(hours=horas)).isoformat()}
+    dismiss_actualizacion(datos.version, datos.horas)
+    return {"ok": True, "dismiss_hasta": (datetime.now() + timedelta(hours=datos.horas)).isoformat()}
 
 
 @router.post("/update/check")

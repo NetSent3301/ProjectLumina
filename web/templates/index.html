@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="static/css/style.css">
+<link rel="stylesheet" href="static/vendor/xterm/xterm.css">
 </head>
 <body>
 
@@ -29,6 +30,9 @@
       </a>
       <a href="#/servidores" class="nav-item" data-view="servidores">
         <span class="nav-dot"></span> servidores
+      </a>
+      <a href="#/terminal" class="nav-item" data-view="terminal">
+        <span class="nav-dot"></span> terminal
       </a>
       <a href="#/registro" class="nav-item" data-view="registro">
         <span class="nav-dot"></span> registro
@@ -138,9 +142,14 @@
           <h1>servicios</h1>
           <p class="topbar-sub">aún no hay servicios conectados</p>
         </div>
-        <button class="btn btn-primary" id="addServiceBtn">
-          <span class="btn-icon">+</span> añadir servicio
-        </button>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" id="deployBtn">
+            <span class="btn-icon">🚀</span> desplegar bot
+          </button>
+          <button class="btn btn-primary" id="addServiceBtn">
+            <span class="btn-icon">+</span> añadir servicio
+          </button>
+        </div>
       </header>
 
       <!-- Selector bots / webs -->
@@ -164,6 +173,9 @@
             <p class="card-empty-title">ningún bot registrado</p>
             <p class="card-empty-sub">registra aquí tus bots (discord, telegram, procesos de python…) para iniciarlos, detenerlos y ver sus logs en este equipo</p>
             <span class="chip">este equipo</span>
+            <button class="btn btn-ghost empty-deploy" id="emptyDeployBtn" style="margin-top: 0.75rem;">
+              <span class="btn-icon">🚀</span> o despliega uno desde un repo git
+            </button>
           </article>
 
           <article class="card card--empty" id="emptyWebs" data-type-panel="web">
@@ -228,6 +240,40 @@
         <div class="cards cards--stack" id="servidoresGrid"></div>
       </section>
 
+    </section>
+
+    <!-- Vista: terminal interactiva -->
+    <section class="view" data-view="terminal">
+      <header class="topbar">
+        <div>
+          <h1>terminal</h1>
+          <p class="topbar-sub">shell interactivo en este servidor</p>
+        </div>
+        <button class="btn btn-ghost" id="termReconnect" title="reconectar el shell">
+          <span class="btn-icon">⟳</span> reconectar
+        </button>
+      </header>
+
+      <section class="section">
+        <div class="terminal terminal--interactive">
+          <div class="terminal-bar">
+            <span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="terminal-title" id="termInteractiveTitle">lumina · bash (local)</span>
+            <div class="terminal-actions">
+              <select class="term-select" id="termCwdSelect" aria-label="Directorio inicial">
+                <option value="">~ (inicio del usuario)</option>
+              </select>
+              <span class="status-pill status-pill--online" id="termConnPill">
+                <span class="pulse"></span> conectado
+              </span>
+            </div>
+          </div>
+          <div class="term-interactive" id="termInteractive" aria-label="Terminal interactiva"></div>
+        </div>
+        <p class="field-hint" style="margin-top: 0.75rem;">
+          Terminal como el usuario del panel (<code>netsent</code>). Para comandos con permisos de administrador necesitas configurar privilegios (<code>LUMINA_SUDO_PASSWORD</code>) y prefijar con <code>sudo</code>.
+        </p>
+      </section>
     </section>
 
     <!-- Vista: registro (logs de systemd en un terminal) -->
@@ -421,6 +467,92 @@
   </div>
 </div>
 
+<!-- ============ MODAL: desplegar un bot desde git ============ -->
+<div class="modal" id="deployModal" aria-hidden="true">
+  <div class="modal-card modal-card--wide" role="dialog" aria-modal="true" aria-labelledby="deployModalTitle">
+    <header class="modal-head">
+      <div>
+        <h2 id="deployModalTitle">desplegar un bot desde git</h2>
+        <p class="modal-sub">clona el repo, instala dependencias y crea la unidad — en un paso</p>
+      </div>
+      <button class="modal-x" id="deployClose" aria-label="cerrar">×</button>
+    </header>
+
+    <form id="deployForm" novalidate>
+
+      <!-- 1 · repositorio -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">1</span> ¿de dónde se clona?</div>
+        <label class="field">
+          <span class="field-label">URL del repositorio <em>*</em></span>
+          <input class="field-input" id="d_repo" name="repo_url" required placeholder="https://github.com/usuario/bot.git" autocomplete="off" spellcheck="false">
+          <span class="field-hint">git clone · https o ssh.</span>
+        </label>
+        <label class="field">
+          <span class="field-label">token <em class="opt">solo si es un repo privado</em></span>
+          <input class="field-input" id="d_token" name="token" type="password" placeholder="personal access token / clave ssh" autocomplete="off" maxlength="300">
+          <span class="field-hint">se usa solo para clonar; <strong>no se guarda</strong> en el panel.</span>
+        </label>
+      </section>
+
+      <!-- 2 · nombre y destino -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">2</span> nombre y carpeta destino</div>
+        <div class="field-grid">
+          <label class="field">
+            <span class="field-label">nombre <em>*</em></span>
+            <input class="field-input" id="d_nombre" name="nombre" required placeholder="ej. mi bot" autocomplete="off" maxlength="80">
+          </label>
+          <label class="field">
+            <span class="field-label">ruta <em class="opt">opcional</em></span>
+            <input class="field-input" id="d_ruta" name="ruta" placeholder="ej. /home/netsent/bots/mi-bot o ~/bots/mi-bot" autocomplete="off" maxlength="200">
+            <span class="field-hint">vacío → <code>~/bots/&lt;nombre&gt;</code></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 3 · lanzamiento -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">3</span> ¿cómo arranca? <em class="opt">opcional</em></div>
+        <label class="field">
+          <span class="field-label">comando</span>
+          <input class="field-input" id="d_comando" name="comando" placeholder="ej. python3 main.py (auto-detecta si lo dejas vacío)" autocomplete="off" maxlength="200">
+          <span class="field-hint">vacío → Lumina detecta el comando según el proyecto (python3 main.py, node ., go run .).</span>
+        </label>
+      </section>
+
+      <!-- 4 · arranque -->
+      <section class="form-group">
+        <div class="form-group-title"><span class="step">4</span> arranque</div>
+        <div class="field-checks">
+          <label class="check">
+            <input type="checkbox" id="d_auto_inicio" name="auto_inicio">
+            <span>auto-inicio (al boot del sistema)</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="d_auto_reinicio" name="auto_reinicio">
+            <span>auto-reinicio (si el proceso cae)</span>
+          </label>
+        </div>
+      </section>
+
+      <p class="modal-error is-hidden" id="deployError"></p>
+
+      <footer class="modal-foot">
+        <button type="button" class="btn" id="deployCancel">cancelar</button>
+        <button type="submit" class="btn btn-primary" id="deploySubmit">
+          <span class="btn-icon">🚀</span> desplegar
+        </button>
+      </footer>
+
+    </form>
+  </div>
+</div>
+
+<script src="static/vendor/xterm/xterm.js"></script>
+<script src="static/vendor/xterm/addon-fit.js"></script>
+<script src="static/vendor/xterm/addon-web-links.js"></script>
+<script src="static/js/terminal.js"></script>
 <script src="static/js/script.js"></script>
 </body>
 </html>

@@ -25,6 +25,7 @@ import subprocess  # Para ejecutar comandos y capturar su salida.
 from pathlib import Path  # Para leer archivos de log de forma multiplataforma.
 
 from .base import InitBackend, InitError  # Contrato abstracto y excepción base.
+from .privilegios import PriviledgeError, ejecutar, es_root
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -331,3 +332,125 @@ class OpenRCBackend(InitBackend):
                     })
 
         return resultados
+
+    # ── Creación y gestión de unidades (v0.2) ─────────────────────────────────
+
+    def soporta_crear_unidades(self) -> bool:
+        """OpenRC sí permite crear servicios (init scripts en /etc/init.d)."""
+        return True
+
+    @property
+    def _dir_init_d(self) -> str:
+        """Directorio donde residen los scripts de servicio de OpenRC."""
+        return "/etc/init.d"
+
+    def _nombre_archivo(self, nombre: str) -> str:
+        """Normaliza el nombre del servicio OpenRC (sin .service, sin guiones raros)."""
+        nombre = nombre.strip()
+        # OpenRC no usa la extensión .service.
+        if nombre.endswith(".service"):
+            nombre = nombre[: -len(".service")]
+        if not nombre:
+            nombre = "lumina-service"
+        return nombre
+
+    def _escribir_script(self, nombre: str, contenido: str) -> None:
+        """Escribe el init script en ``/etc/init.d`` y lo hace ejecutable (con sudo)."""
+        ruta = f"{self._dir_init_d}/{nombre}"
+
+        try:
+            r = ejecutar(["tee", ruta], stdin_texto=contenido, timeout=15)
+        except PriviledgeError as error:
+            raise InitError(f"no se pudo escribir el servicio '{nombre}': {error}")
+
+        if r.returncode != 0:
+            raise InitError(f"no se pudo escribir el servicio '{nombre}': {_texto(r)}")
+
+        # Los scripts de OpenRC deben ser ejecutables.
+        try:
+            r = ejecutar(["chmod", "+x", ruta], timeout=10)
+        except PriviledgeError as error:
+            raise InitError(f"no se pudo hacer ejecutable '{nombre}': {error}")
+        if r.returncode != 0:
+            raise InitError(f"chmod falló para '{nombre}': {_texto(r)}")
+
+    def _que_supervise_duemon(self) -> bool:
+        """Indica si OpenRC soporta ``supervise-daemon`` (auto-reinicio)."""
+        # supervise-daemon existe desde OpenRC 0.17 (presente en Alpine 3.x moderno).
+        return shutil.which("supervise-daemon") is not None
+
+    def daemon_reload(self) -> None:
+        """OpenRC no necesita recarga tras crear scripts de init."""
+        return  # No-op: los init scripts se leen directamente.
+
+    def habilitar(self, nombre: str, activo: bool = True) -> None:
+        """Habilita (``rc-update add``) o deshabilita (``rc-update del``) el servicio."""
+        accion = "add" if activo else "del"
+        try:
+            r = ejecutar(["rc-update", accion, nombre, "default"], timeout=30)
+        except PriviledgeError as error:
+            raise InitError(f"rc-update {accion} {nombre}: {error}")
+        if r.returncode != 0:
+            raise InitError(f"rc-update {accion} {nombre}: {_texto(r)}")
+
+    def crear_unidad(
+        self,
+        nombre: str,
+        *,
+        comando: str,
+        ruta: str,
+        usuario: Optional[str] = None,
+        entorno: Optional[dict] = None,
+        auto_inicio: bool = False,
+        auto_reinicio: bool = False,
+        descripcion: str = "",
+    ) -> str:
+        """Crea un servicio OpenRC: init script + (opcional) rc-update add.
+
+        Genera un script compatible con OpenRC moderno usando
+        ``start-stop-daemon`` (o ``supervise-daemon`` cuando se pide
+        auto-reinicio, para que el proceso se re-arranque al caer).
+        """
+        nombre_s = self._nombre_archivo(nombre)
+        ruta_abs = Path(ruta or "~").expanduser() or Path.home()
+        usuario_target = usuario or ("" if es_root() else __import__("getpass").getuser())
+
+        # Construimos el comando en dos partes: binario + argumentos.
+        programa, *argumentos = (comando or "true").split()
+
+        lineas = ["#!/sbin/openrc-run", f"name=\"{descripcion or nombre_s}\""]
+
+        if self._que_supervise_duemon() and auto_reinicio:
+            # supervise-daemon añade respawn para auto-reinicio automático.
+            lineas += [
+                "supervisor=supervise-daemon",
+                f"command=\"{programa}\"",
+                f"command_args=\"{' '.join(argumentos)}\"",
+                f"directory=\"{ruta_abs}\"",
+                "supervise_daemon_args=\"--respawn --respawn-delay 3\"",
+            ]
+        else:
+            lineas += [
+                f"command=\"{programa}\"",
+                f"command_args=\"{' '.join(argumentos)}\"",
+                f"directory=\"{ruta_abs}\"",
+            ]
+
+        if usuario_target:
+            lineas.append(f"command_user=\"{usuario_target}\"")
+
+        # Variables de entorno extra.
+        entorno = entorno or {}
+        if entorno:
+            env = " ".join(f"{k}=\"{v}\"" for k, v in entorno.items())
+            lineas.append(f'export {env}')
+
+        lineas.append("")
+        contenido = "\n".join(lineas) + "\n"
+
+        self._escribir_script(nombre_s, contenido)
+
+        if auto_inicio:
+            self.habilitar(nombre_s, activo=True)
+
+        return nombre_s

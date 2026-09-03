@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initServiceTabs();
   initTerminal();
   initServidores();
+  initDeployModal();
   initUpdateNotifications();
   loadServicios();
   loadMetricas();
@@ -338,7 +339,7 @@ function tarjetaServicio(s){
   return card;
 }
 
-function escaper(valor){
+function escapar(valor){
   return String(valor).replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
@@ -596,7 +597,7 @@ async function conectarServicio(event){
 
     cerrarModal();
     logEvent(
-      `servicio <strong>${escaper(s.nombre)}</strong> conectado · estado: <strong>${s.estado}</strong>` +
+      `servicio <strong>${escapar(s.nombre)}</strong> conectado · estado: <strong>${s.estado}</strong>` +
       (s.tipo === 'web' && s.check_url ? ' · verificado por HTTP' : ''),
       'ok'
     );
@@ -767,7 +768,7 @@ async function cargarTerminal(id, silencioso = false){
     const lineas = contenido ? contenido.split('\n') : ['// log vacío'];
     if (body) {
       body.innerHTML = lineas.map(linea => {
-        const esc = escaper(linea);
+        const esc = escapar(linea);
         return `<div>${resaltarLog(esc) || '&nbsp;'}</div>`;
       }).join('');
     }
@@ -807,7 +808,7 @@ function resaltarLog(esc){
 function escribirTerminal(texto){
   const body = document.getElementById('termBody');
   if (!body) return;
-  body.innerHTML = `<div class="term-placeholder">${escaper(texto)}</div>`;
+  body.innerHTML = `<div class="term-placeholder">${escapar(texto)}</div>`;
   scrollTerminal();
 }
 

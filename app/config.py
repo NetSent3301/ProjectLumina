@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     update_check_interval_hours: int = 6       # cada cuántas horas comprobar
     update_notify_enabled: bool = True         # activar/desactivar notificaciones
 
+    # Privilegios (opcional). Contraseña de sudo para operaciones que
+    # requieren root (crear unidades systemd, terminal privilegiada…).
+    # Se lee desde el entorno / .env (gitignored). Vacío → no usa sudo con
+    # contraseña (depende de que el usuario del panel tenga permisos).
+    sudo_password: str = ""
+
 
 def get_settings() -> Settings:
     """Devuelve la configuración actual.

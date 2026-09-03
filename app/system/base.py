@@ -16,6 +16,7 @@ implementación real a través de ``detector.get_backend()``.
 from __future__ import annotations  # Habilita anotaciones de tipo en forma de string (PEP 563).
 
 from abc import ABC, abstractmethod  # ABC = Abstract Base Class; abstractmethod marca métodos obligatorios.
+from typing import Optional          # Para anotaciones de tipos opcionales (None por defecto).
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -174,3 +175,70 @@ class InitBackend(ABC):
                 ``unidad``  — nombre del servicio.
                 ``estado``  — estado en texto (``"running"``, ``"active"``…).
         """
+
+    # ── Creación y gestión de unidades (v0.2) ─────────────────────────────────
+
+    def crear_unidad(
+        self,
+        nombre: str,
+        *,
+        comando: str,
+        ruta: str,
+        usuario: Optional[str] = None,
+        entorno: Optional[dict] = None,
+        auto_inicio: bool = False,
+        auto_reinicio: bool = False,
+        descripcion: str = "",
+    ) -> str:
+        """Genera, instala y (opcionalmente) habilita una unidad de servicio.
+
+        Por defecto no está soportado: los backends concretos que sí pueden
+        crear unidades (systemd) lo sobreescriben.  El resto lanza
+        ``InitError`` para informar al usuario.
+
+        Args:
+            nombre:         Nombre de la unidad SIN extensión (p. ej. ``"mi-bot"``).
+            comando:        Comando de lanzamiento completo (p. ej. ``python3 bot.py``).
+            ruta:           Directorio de trabajo del proceso.
+            usuario:        Usuario del sistema con el que correr (None → el del panel).
+            entorno:        Variables de entorno extra para la unidad.
+            auto_inicio:    Habilitar arranque al boot (systemd: ``enable``).
+            auto_reinicio:  Reiniciar el proceso al caer (systemd: ``Restart=on-failure``).
+            descripcion:    Descripción legible de la unidad.
+
+        Returns:
+            El nombre completo de la unidad instalada (con extensión).
+
+        Raises:
+            InitError: Si el backend no soporta crear unidades.
+        """
+        raise InitError(
+            f"el init system '{self.nombre()}' no soporta crear unidades "
+            "desde el panel"
+        )
+
+    def habilitar(self, nombre: str, activo: bool = True) -> None:
+        """Habilita o deshabilita el arranque automático de una unidad.
+
+        Por defecto no soportado; los backends que lo permiten lo sobreescriben.
+
+        Raises:
+            InitError: Si el backend no lo soporta.
+        """
+        raise InitError(
+            f"el init system '{self.nombre()}' no soporta habilitar unidades"
+        )
+
+    def daemon_reload(self) -> None:
+        """Recarga la configuración del init system tras cambios de unidades.
+
+        Raises:
+            InitError: Si el backend no lo soporta.
+        """
+        raise InitError(
+            f"el init system '{self.nombre()}' no soporta daemon-reload"
+        )
+
+    def soporta_crear_unidades(self) -> bool:
+        """Indica si este backend permite crear unidades (solo systemd por ahora)."""
+        return False

@@ -17,7 +17,7 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api import servidor, servidores, servicios, update
+from .api import despliegues, servidor, servidores, servicios, terminal, update
 from .api.auth import require_token
 from .config import get_settings
 from .db import init_db
@@ -81,6 +81,15 @@ def create_app() -> FastAPI:
         tags=["servidores"],
         dependencies=[Depends(require_token)],
     )
+    # Despliegue de bots (git → unidad systemd). Requiere token.
+    app.include_router(
+        despliegues.router,
+        prefix="/api",
+        tags=["despliegues"],
+        dependencies=[Depends(require_token)],
+    )
+    # Terminal interactiva (WebSocket). Autenticación interna con ?token=.
+    app.include_router(terminal.router)
     # Update endpoints: /api/update (GET sin token, POST con token)
     app.include_router(update.router)
 
