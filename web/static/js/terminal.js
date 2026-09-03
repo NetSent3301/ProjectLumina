@@ -12,6 +12,12 @@ let termEstadoLigadura = 'conectando';
 document.addEventListener('DOMContentLoaded', () => {
   initTerminalInteractiva();
 
+  // Si ya estamos en la vista terminal al cargar (recarga directa /#/terminal),
+  // conecta el shell.
+  if ((window.location.hash || '').includes('terminal')) {
+    setTimeout(conectarTerminal, 150);
+  }
+
   // Reconectar al volver a la vista terminal.
   window.addEventListener('hashchange', () => {
     if ((window.location.hash || '').includes('terminal')) {

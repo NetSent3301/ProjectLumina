@@ -1119,3 +1119,37 @@ a:focus-visible, button:focus-visible{
     flex: 1;
   }
 }
+
+/* ============ AñadirDeploy / Terminal interactiva (v0.2) ============ */
+
+.topbar-actions{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-card--wide{
+  max-width: 640px;
+}
+
+.term-interactive{
+  height: 460px;
+  padding: 10px;
+  background: #0d1117;
+  border-radius: 0 0 var(--radius, 12px) var(--radius, 12px);
+}
+.term-interactive .xterm{
+  height: 100%;
+}
+.term-interactive .xterm-viewport{
+  background-color: transparent !important;
+}
+
+.terminal--interactive .terminal-bar{
+  border-radius: var(--radius, 12px) var(--radius, 12px) 0 0;
+}
+
+.empty-deploy{
+  width: 100%;
+}
+

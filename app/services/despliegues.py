@@ -43,13 +43,29 @@ def _autodetect_tipo(repo_url: str, ruta: Path) -> str:
         Tuple con (tipo_servicio, comando_por_defecto).
         tipo: ``"bot"`` o ``"web"``; comando: recomendado o "".
     """
+    # Python: requirements.txt, pyproject.toml o un main.py en la raíz.
     if (ruta / "requirements.txt").exists() or (ruta / "pyproject.toml").exists():
         return "bot", "python3 main.py"
+    if (ruta / "main.py").exists():
+        return "bot", "python3 main.py"
+
+    # Node.js.
     if (ruta / "package.json").exists():
-        # No sabemos si es una API (web) o un bot JS; asumimos bot por defecto.
-        return "bot", "node ."
+        # Si hay un script "start" en package.json lo usamos; si no, "node .".
+        entrada = None
+        try:
+            import json
+            pkg = json.loads((ruta / "package.json").read_text(errors="replace"))
+            scripts = pkg.get("scripts", {})
+            if "start" in scripts:
+                entrada = scripts["start"]
+        except Exception:
+            pass
+        return "bot", entrada or "node ."
+
     if (ruta / "go.mod").exists():
         return "bot", "go run ."
+
     return "bot", ""
 
 

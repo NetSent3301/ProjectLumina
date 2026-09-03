@@ -25,7 +25,7 @@ import subprocess  # Para ejecutar comandos y capturar su salida.
 from pathlib import Path  # Para leer archivos de log de forma multiplataforma.
 
 from .base import InitBackend, InitError  # Contrato abstracto y excepción base.
-from .privilegios import PriviledgeError, ejecutar, es_root
+from .privilegios import PriviledgeError, ejecutar, es_root, escribir_archivo_privilegiado
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -359,14 +359,17 @@ class OpenRCBackend(InitBackend):
         ruta = f"{self._dir_init_d}/{nombre}"
 
         try:
-            r = ejecutar(["tee", ruta], stdin_texto=contenido, timeout=15)
+            # Escritura segura vía archivo temporal + sudo install (evita que
+            # la contraseña de sudo corrompa el contenido del script).
+            escribir_archivo_privilegiado(
+                ruta, contenido, modo="0755", propietario="root", grupo="root"
+            )
         except PriviledgeError as error:
             raise InitError(f"no se pudo escribir el servicio '{nombre}': {error}")
 
-        if r.returncode != 0:
-            raise InitError(f"no se pudo escribir el servicio '{nombre}': {_texto(r)}")
-
-        # Los scripts de OpenRC deben ser ejecutables.
+        # Los scripts de OpenRC deben ser ejecutables (0755 ya lo garantiza
+        # vía install), pero lo reforzamos por compatibilidad con sistemas
+        # donde el directorio esté montado con opciones restrictivas.
         try:
             r = ejecutar(["chmod", "+x", ruta], timeout=10)
         except PriviledgeError as error:

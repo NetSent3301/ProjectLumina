@@ -21,7 +21,7 @@ import shutil      # Para ``shutil.which``: verifica si un binario existe en PAT
 import subprocess  # Para ejecutar comandos del sistema y capturar su salida.
 
 from .base import InitBackend, InitError  # Contrato abstracto e excepción base.
-from .privilegios import PriviledgeError, ejecutar, es_root
+from .privilegios import PriviledgeError, ejecutar, es_root, escribir_archivo_privilegiado
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -283,28 +283,22 @@ class SystemdBackend(InitBackend):
     def _escribir_unidad(self, nombre_archivo: str, contenido: str) -> None:
         """Escribe el archivo de unidad en ``/etc/systemd/system`` con sudo si hace falta.
 
-        Usa ``tee`` para respetar redirección y permisos vía ``sudo``.
+        Usa ``escribir_archivo_privilegiado`` (contenido por archivo temporal
+        y ``sudo install``) para evitar corromper la unidad con la contraseña.
         """
         ruta = os.path.join(self._dir_unidades, nombre_archivo)
 
         try:
-            # Escribimos usando un comando que acepte el contenido por stdin.
-            r = ejecutar(
-                ["tee", ruta],
-                stdin_texto=contenido,
-                timeout=15,
+            # Escritura segura: el contenido va por archivo temporal, no por
+            # el mismo stdin que la contraseña de sudo.
+            escribir_archivo_privilegiado(
+                ruta, contenido, modo="0644", propietario="root", grupo="root"
             )
         except PriviledgeError as error:
             raise InitError(
                 f"no se pudo escribir la unidad '{nombre_archivo}': {error}",
                 no_existe=False,
             ) from None
-
-        if r.returncode != 0:
-            raise InitError(
-                f"no se pudo escribir la unidad '{nombre_archivo}': "
-                f"{_texto(r)}"
-            )
 
     def daemon_reload(self) -> None:
         """Recarga la configuración de systemd tras crear/editar unidades."""

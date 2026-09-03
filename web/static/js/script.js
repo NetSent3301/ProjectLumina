@@ -1209,3 +1209,129 @@ function escapeHtml(text){
   div.textContent = text;
   return div.innerHTML;
 }
+
+/* ==========================================================
+   Modal: desplegar un bot desde git
+   ========================================================== */
+
+function initDeployModal(){
+  const modal = document.getElementById('deployModal');
+  if (!modal) return;
+
+  // Apertura desde el botón de la vista servicios, la tarjeta vacía y botones.
+  const abreBtns = ['deployBtn', 'emptyDeployBtn', 'deployEmptyLink'];
+  abreBtns.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', () => abrirDeployModal());
+  });
+
+  const close = document.getElementById('deployClose');
+  if (close) close.addEventListener('click', cerrarDeployModal);
+  const cancel = document.getElementById('deployCancel');
+  if (cancel) cancel.addEventListener('click', cerrarDeployModal);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarDeployModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) cerrarDeployModal();
+  });
+
+  const form = document.getElementById('deployForm');
+  if (form) form.addEventListener('submit', desplegarBot);
+}
+
+function abrirDeployModal(){
+  const modal = document.getElementById('deployModal');
+  if (!modal) return;
+  ['d_nombre', 'd_repo', 'd_token', 'd_ruta', 'd_comando'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['d_auto_inicio', 'd_auto_reinicio'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = false;
+  });
+  const err = document.getElementById('deployError');
+  if (err) err.classList.add('is-hidden');
+  modal.classList.add('is-open');
+  modal.setAttribute('aria-hidden', 'false');
+  const nombre = document.getElementById('d_nombre');
+  if (nombre) setTimeout(() => nombre.focus(), 30);
+}
+
+function cerrarDeployModal(){
+  const modal = document.getElementById('deployModal');
+  if (!modal) return;
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
+  // Restablece el botón por si quedó deshabilitado.
+  const submit = document.getElementById('deploySubmit');
+  if (submit){
+    submit.disabled = false;
+    const icon = submit.querySelector('.btn-icon');
+    if (icon) icon.textContent = '🚀';
+  }
+}
+
+function mostrarDeployError(mensaje){
+  const el = document.getElementById('deployError');
+  if (!el) return;
+  el.textContent = mensaje;
+  el.classList.remove('is-hidden');
+}
+
+async function desplegarBot(event){
+  event.preventDefault();
+
+  const nombre = document.getElementById('d_nombre').value.trim();
+  const repo = document.getElementById('d_repo').value.trim();
+  if (!nombre || !repo) return;
+
+  const payload = {
+    nombre,
+    repo_url: repo,
+    token: document.getElementById('d_token').value.trim() || '',
+    ruta: document.getElementById('d_ruta').value.trim() || null,
+    comando: document.getElementById('d_comando').value.trim(),
+    auto_inicio: document.getElementById('d_auto_inicio').checked,
+    auto_reinicio: document.getElementById('d_auto_reinicio').checked,
+    instalar_deps: true,
+  };
+
+  const submit = document.getElementById('deploySubmit');
+  if (submit){
+    submit.disabled = true;
+    const icon = submit.querySelector('.btn-icon');
+    if (icon) icon.textContent = '…';
+  }
+
+  try {
+    const s = await api('/api/despliegues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    cerrarDeployModal();
+    logEvent(
+      `bot <strong>${escapar(s.nombre)}</strong> desplegado desde git · unidad <strong>${escapar(s.servicio)}</strong> · estado: <strong>${s.estado}</strong>`,
+      'ok'
+    );
+
+    await estado.cargar();
+    renderServicios();
+    poblarTerminalSelect();
+    if (window.poblarCwdSelect) window.poblarCwdSelect();
+
+    window.location.hash = '#/servicios';
+  } catch (error) {
+    mostrarDeployError(`no se pudo desplegar el bot: ${error.message}`);
+  } finally {
+    if (submit){
+      submit.disabled = false;
+      const icon = submit.querySelector('.btn-icon');
+      if (icon) icon.textContent = '🚀';
+    }
+  }
+}

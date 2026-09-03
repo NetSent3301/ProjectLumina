@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import tempfile
 from typing import Optional
 
 from ..config import get_settings
@@ -168,3 +169,56 @@ def verificar_privilegios() -> None:
             "define LUMINA_SUDO_PASSWORD en el entorno (ver docs). "
             f"salida: {(r.stderr or r.stdout or '').strip()}"
         )
+
+
+def escribir_archivo_privilegiado(ruta: str, contenido: str,
+                                  *, modo: str = "0644",
+                                  propietario: str = "root",
+                                  grupo: str = "root") -> None:
+    """Escribe un archivo con privilegios de root sin mezclar contraseña y contenido.
+
+    Estrategia **segura frente al bug del stdin compartido** de ``sudo -S``:
+    escribir el contenido a un archivo temporal (como el usuario del panel,
+    sin sudo) y después elevarlo al destino con ``sudo install``.  Así el
+    contenido viaja en un archivo y sudo solo recibe la contraseña, sin
+    ningún riesgo de que se corrompan entre sí.
+
+    Args:
+        ruta:        Ruta destino del archivo.
+        contenido:   Contenido de texto a escribir.
+        modo:        Permisos en octal (string), p. ej. ``"0644"``.
+        propietario: Usuario propietario del archivo.
+        grupo:       Grupo propietario del archivo.
+
+    Raises:
+        PriviledgeError: Si falla la escritura o la elevación de permisos.
+    """
+    if es_root():
+        # Ya somos root: escribimos directamente.
+        os.makedirs(os.path.dirname(ruta) or ".", exist_ok=True)
+        with open(ruta, "w") as f:
+            f.write(contenido)
+        os.chmod(ruta, int(modo, 8))
+        return
+
+    # 1) Escribimos el archivo temporal como usuario normal.
+    fd, tmp = tempfile.mkstemp(prefix="lumina-", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write(contenido)
+
+        # 2) Elevamos: sudo install -o <owner> -g <group> -m <modo> tmp -> ruta.
+        r = ejecutar(
+            ["install", "-o", propietario, "-g", grupo, "-m", modo, tmp, ruta],
+            timeout=20,
+        )
+        if r.returncode != 0:
+            raise PriviledgeError(
+                f"no se pudo instalar '{ruta}': "
+                f"{(r.stderr or r.stdout or '').strip()}"
+            )
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
