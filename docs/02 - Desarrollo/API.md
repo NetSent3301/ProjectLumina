@@ -32,6 +32,49 @@ Todas las rutas de la API (salvo `/api/health`) exigen un **token**:
 | GET | `/api/servidor/procesos` | Procesos activos. |
 | GET | `/api/servidor/servicios` | Servicios systemd activos. |
 
+### Endpoints v0.2 (despliegue + terminal)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/despliegues` | Desplegar un bot desde un repo git y dejarlo corriendo como servicio. |
+| WS | `/api/terminal?token=…` | Terminal interactiva (WebSocket). Autentica con el token en el query string. |
+
+#### `POST /api/despliegues`
+
+Despliega un bot git (público o privado) como servicio:
+
+```json
+{
+  "nombre": "mi-bot",
+  "repo_url": "https://github.com/usuario/repo",          // o SSH / file://
+  "token": "…",                                            // opcional, repo privado (no se guarda)
+  "ruta": "/srv/bots/mi-bot",
+  "comando": "python3 main.py",                            // opcional; si se omite, se autodetecta
+  "auto_inicio": true,                                     // opcional, arrancar con el sistema
+  "auto_reinicio": true,                                   // opcional, reiniciar si falla
+  "instalar_deps": true                                    // opcional, pip/npm según el proyecto
+}
+```
+
+- El panel clona el repo (con `--depth 1`), autodetecta el lenguaje y comando por defecto
+  (`main.py`/`requirements.txt` → `python3 main.py`, `package.json` → `node .`,
+  `go.mod` → `go run .`), crea la unidad del gestor de arranque detectado
+  (systemd en Linux, OpenRC en Alpine), la habilita e inicia el bot.
+- Response `201` con el servicio creado (mismo shape que `GET /api/servicios`).
+- Errores del despliegue → `502` con el motivo en `detail`.
+- Los repos privados se autentican con el `token` del cuerpo (usado una sola vez,
+  nunca persistido).
+
+#### `WS /api/terminal`
+
+Abre un shell interactivo en el servidor (como el usuario del panel).
+
+- Autenticación: `?token=<API token>`. Si `LUMINA_TOKEN` está vacío no se exige (solo dev local).
+- Token erróneo → el servidor cierra con código `4401`.
+- `?cwd=/ruta` (opcional): inicia el shell en un directorio concreto (p. ej. el del servicio).
+- Flujo: el cliente manda texto → se escribe al PTY; el PTY manda salida → el cliente la pinta.
+- Adecuado para usarse con Xterm.js en el frontend.
+
 ### Mapa con el dashboard
 
 - "Actualizar estado" → `GET /api/servicios`.
@@ -44,12 +87,10 @@ El registro de actividad de **Resumen** se alimenta de los resultados de estas l
 
 ---
 
-## WebSockets (futuro)
+## WebSockets
 
-WebSockets podrán incorporarse **posteriormente** cuando se necesite **información en tiempo real**.
-
-- Notificaciones en vivo → [Notificaciones](Notificaciones.md).
-- Métricas en tiempo real → [Dashboard](Dashboard.md).
+- **Terminal interactiva** (v0.2) → `WS /api/terminal` (ver arriba).
+- **Futuro:** notificaciones y métricas en tiempo real → [Notificaciones](Notificaciones.md), [Dashboard](Dashboard.md).
 
 ---
 

@@ -1,6 +1,11 @@
 # Dependencias
 node_modules/
 vendor/
+# Excepción: librerías estáticas del frontend referenciadas en el HTML
+# (xterm.js + addons), que se envían sin build/npm.
+!web/static/vendor/
+web/static/vendor/*
+!web/static/vendor/xterm/
 
 # Entornos virtuales de Python
 venv/

@@ -4,6 +4,37 @@
 
 ---
 
+## [v0.1.2] - 2026-09-02
+
+### Añadido
+- **Despliegue de bots desde git**: `POST /api/despliegues` clona un repo (público o privado via token temporal), autodetecta lenguaje/comando (`python3 main.py`, `node .`, `go run .`), crea la unidad del gestor de arranque (systemd o OpenRC), la habilita e inicia el bot.
+  - `app/models/despliegue.py` — `DespliegueGit` (repo_url, token no persistido, ruta, comando, auto_inicio, auto_reinicio, instalar_deps).
+  - `app/services/despliegues.py` — orquestador (`_clonar` con `--depth 1`, `_autodetect_tipo`, `_instalar_deps`, `_crear_unidad`, `_registrar_servicio`).
+  - `app/api/despliegues.py`.
+  - Backend de unidades: `SystemdBackend.crear_unidad/habilitar` y `OpenRCBackend.crear_unidad/habilitar` (+ métodos base por defecto en `app/system/base.py`).
+  - Frontend: modal de despliegue (4 pasos) en `index.html`, `initDeployModal`/`desplegarBot` en `script.js`.
+- **Terminal interactiva** en el panel: `WS /api/terminal` + Xterm.js.
+  - `app/services/terminal.py` — `PTYProceso` (openpty) + `emparejar()` (puente WebSocket↔PTY).
+  - `app/api/terminal.py` — WebSocket autenticado por `?token=`, con `?cwd=` opcional; cierra con `4401` si el token es erróneo.
+  - `app/services/terminal.py` verificado con uvicorn real + cliente websockets.
+  - Frontend: `web/static/js/terminal.js` (Xterm.js + FitAddon, reconexión, selector de cwd desde los servicios) + xterm.js 5.5.0 estático en `web/static/vendor/xterm/` (sin npm).
+- **Helper privilegiado seguro** `escribir_archivo_privilegiado()` en `app/system/privilegios.py`: escribe archivos de sistema vía archivo temporal + `sudo install`, eliminando el bug del stdin compartido que corrompía las unidades con la contraseña.
+
+### Cambiado
+- `web/static/css/style.css`: estilos para `topbar-actions`, `modal-card--wide`, `term-interactive` y `empty-deploy`.
+- `app/system/systemd.py` y `app/system/openrc.py`: escritura de unidades vía `escribir_archivo_privilegiado` (antes `tee` con stdin → corrupto).
+
+### Corregido
+- **Bug crítico**: `initDeployModal()` se llamaba pero no estaba definido → `ReferenceError` rompía todo el `DOMContentLoaded` e impedía cargar el servidor principal (`cargarConexion`) y los servicios. Raíz del problema "el servidor principal no aparece".
+- **Bug de escritura de unidades**: la contraseña de sudo terminaba como primera línea del `.service`/`.service` (archivo corrupto) por mezclar contraseña y contenido en el mismo stdin. Resuelto con `sudo install` desde archivo temporal.
+- Verificado end-to-end vía HTTP: `estado: online`, unidad activa (`systemctl is-active`) y habilitada (`auto_inicio`).
+
+### Añadido (tests)
+- `pruebas/test_despliegues.py` — auto-detección de comando (main.py, requirements, node, go, vacío).
+- `pruebas/test_endpoints_v2.py` — `POST /api/despliegues` (auth, 201, 502) y auth de `WS /api/terminal` (rechazo 4401, aceptación).
+
+---
+
 ## [v0.1.1] - 2026-08-31
 
 ### Añadido
