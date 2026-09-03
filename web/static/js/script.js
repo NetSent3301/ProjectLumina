@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initServidores();
   initDeployModal();
   initUpdateNotifications();
+  initTokenForm();
   loadServicios();
   loadMetricas();
   cargarConexion();
@@ -1334,4 +1335,45 @@ async function desplegarBot(event){
       if (icon) icon.textContent = '🚀';
     }
   }
+}
+
+/* ---------- ajustes: guardar / borrar token de API ---------- */
+function initTokenForm(){
+  const input = document.getElementById('apiTokenInput');
+  const save = document.getElementById('saveTokenBtn');
+  const clear = document.getElementById('clearTokenBtn');
+  const status = document.getElementById('tokenStatus');
+  if (!input) return;
+
+  // El token guardado se rellena en el input de forma censurada.
+  if (estado.token) input.value = estado.token;
+
+  const avisar = (mensaje, tipo = '') => {
+    if (!status) return;
+    status.textContent = mensaje;
+    status.style.color = tipo === 'ok' ? 'var(--ok)' : (tipo === 'err' ? 'var(--danger)' : '');
+  };
+
+  const guardar = () => {
+    const valor = input.value.trim();
+    if (!valor) {
+      avisar('escribe tu token antes de guardarlo.', 'err');
+      input.focus();
+      return;
+    }
+    localStorage.setItem('lumina_token', valor);
+    estado.token = valor;
+    avisar('token guardado y aplicado. Ahora conecta la API.', 'ok');
+  };
+
+  const borrar = () => {
+    localStorage.removeItem('lumina_token');
+    estado.token = '';
+    if (input) input.value = '';
+    avisar('token borrado. El panel quedará sin acceso hasta que guardes uno.', '');
+    loadServicios();
+  };
+
+  if (save) save.addEventListener('click', guardar);
+  if (clear) clear.addEventListener('click', borrar);
 }
